@@ -255,9 +255,9 @@ Example completion report:
 Self-Review: ✅ Types clean | ✅ Imports verified | ✅ No debug artifacts | ✅ All acceptance criteria met | ✅ External libs verified
 
 Deliverables:
-- src/auth/service.ts
-- src/auth/middleware.ts
-- src/auth/types.ts
+- src/auth/service.go
+- src/auth/middleware.go
+- src/auth/types.go
 
 Summary: Implemented JWT authentication with refresh tokens and error handling
 ```
@@ -289,7 +289,7 @@ Always
 - Standard library first
 - context.Context as first parameter (if present)
 - fmt.Errorf("%w") for error wrapping
-- Table-driven tests
+- Table-driven tests (if the unit test fail try to corrected)
 - Interfaces for mocking
 - go fmt before completion
 
