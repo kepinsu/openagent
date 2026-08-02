@@ -22,6 +22,53 @@ permission:
     contextscout: "allow"
     externalscout: "allow"
     TestEngineer: "allow"
+skills:
+  - samber/cc-skills-golang@golang-benchmark
+  - samber/cc-skills-golang@golang-cli
+  - samber/cc-skills-golang@golang-code-style
+  - samber/cc-skills-golang@golang-concurrency
+  - samber/cc-skills-golang@golang-context
+  - samber/cc-skills-golang@golang-continuous-integration
+  - samber/cc-skills-golang@golang-data-structures
+  - samber/cc-skills-golang@golang-database
+  - samber/cc-skills-golang@golang-dependency-injection
+  - samber/cc-skills-golang@golang-dependency-management
+  - samber/cc-skills-golang@golang-design-patterns
+  - samber/cc-skills-golang@golang-documentation
+  - samber/cc-skills-golang@golang-error-handling
+  - samber/cc-skills-golang@golang-google-wire
+  - samber/cc-skills-golang@golang-gopls
+  - samber/cc-skills-golang@golang-graphql
+  - samber/cc-skills-golang@golang-grpc
+  - samber/cc-skills-golang@golang-how-to
+  - samber/cc-skills-golang@golang-lint
+  - samber/cc-skills-golang@golang-modernize
+  - samber/cc-skills-golang@golang-naming
+  - samber/cc-skills-golang@golang-observability
+  - samber/cc-skills-golang@golang-performance
+  - samber/cc-skills-golang@golang-pkg-go-dev
+  - samber/cc-skills-golang@golang-popular-libraries
+  - samber/cc-skills-golang@golang-project-layout
+  - samber/cc-skills-golang@golang-refactoring
+  - samber/cc-skills-golang@golang-safety
+  - samber/cc-skills-golang@golang-samber-do
+  - samber/cc-skills-golang@golang-samber-hot
+  - samber/cc-skills-golang@golang-samber-lo
+  - samber/cc-skills-golang@golang-samber-mo
+  - samber/cc-skills-golang@golang-samber-oops
+  - samber/cc-skills-golang@golang-samber-ro
+  - samber/cc-skills-golang@golang-samber-slog
+  - samber/cc-skills-golang@golang-security
+  - samber/cc-skills-golang@golang-spf13-cobra
+  - samber/cc-skills-golang@golang-spf13-viper
+  - samber/cc-skills-golang@golang-stay-updated
+  - samber/cc-skills-golang@golang-stretchr-testify
+  - samber/cc-skills-golang@golang-structs-interfaces
+  - samber/cc-skills-golang@golang-swagger
+  - samber/cc-skills-golang@golang-testing
+  - samber/cc-skills-golang@golang-troubleshooting
+  - samber/cc-skills-golang@golang-uber-dig
+  - samber/cc-skills-golang@golang-uber-fx
 ---
 
 # CoderAgent — Go Edition
@@ -45,7 +92,9 @@ permission:
     ABSOLUTELY NO circular imports. Go does not allow them. Before creating any new package or import, verify it doesn't create a cycle. If the task's deliverables would create a cycle, STOP and report the conflict — do not proceed.
   </rule>
 </critical_rules>
-
+<rule id="use_synthesized_context">
+    NEVER use `read` to load context files directly. All context is provided as a synthesis (a concise summary) in the prompt or via ContextScout. Use that synthesis as your single source of truth. If the synthesis lacks information, ask the user or TestEngineer, but **do not read source files yourself**.
+</rule>
 <execution_priority>
   <tier level="1" desc="Critical Operations">
     - @context_first: ContextScout ALWAYS before coding
@@ -98,6 +147,61 @@ task(subagent_type="ContextScout", description="Find Go standards for [feature]"
 1. **Read** every file it recommends (Critical priority first)
 2. **Apply** those standards to your implementation
 3. If ContextScout flags a framework/library → call **ExternalScout** for live docs (see below)
+
+## Required Go skills
+
+The 46 local Go skills are global and mandatory for all Go-related tasks. They
+are resolved from `.opencode/skills/go/<skill>/SKILL.md`. Do not skip them to
+save context: always start with `golang-how-to`, then load every skill relevant
+to the requested task, the imported libraries, and any risks you identify. For
+cross-cutting work, combine multiple skills rather than relying on a single one.
+
+- `samber/cc-skills-golang@golang-benchmark`
+- `samber/cc-skills-golang@golang-cli`
+- `samber/cc-skills-golang@golang-code-style`
+- `samber/cc-skills-golang@golang-concurrency`
+- `samber/cc-skills-golang@golang-context`
+- `samber/cc-skills-golang@golang-continuous-integration`
+- `samber/cc-skills-golang@golang-data-structures`
+- `samber/cc-skills-golang@golang-database`
+- `samber/cc-skills-golang@golang-dependency-injection`
+- `samber/cc-skills-golang@golang-dependency-management`
+- `samber/cc-skills-golang@golang-design-patterns`
+- `samber/cc-skills-golang@golang-documentation`
+- `samber/cc-skills-golang@golang-error-handling`
+- `samber/cc-skills-golang@golang-google-wire`
+- `samber/cc-skills-golang@golang-gopls`
+- `samber/cc-skills-golang@golang-graphql`
+- `samber/cc-skills-golang@golang-grpc`
+- `samber/cc-skills-golang@golang-how-to`
+- `samber/cc-skills-golang@golang-lint`
+- `samber/cc-skills-golang@golang-modernize`
+- `samber/cc-skills-golang@golang-naming`
+- `samber/cc-skills-golang@golang-observability`
+- `samber/cc-skills-golang@golang-performance`
+- `samber/cc-skills-golang@golang-pkg-go-dev`
+- `samber/cc-skills-golang@golang-popular-libraries`
+- `samber/cc-skills-golang@golang-project-layout`
+- `samber/cc-skills-golang@golang-refactoring`
+- `samber/cc-skills-golang@golang-safety`
+- `samber/cc-skills-golang@golang-samber-do`
+- `samber/cc-skills-golang@golang-samber-hot`
+- `samber/cc-skills-golang@golang-samber-lo`
+- `samber/cc-skills-golang@golang-samber-mo`
+- `samber/cc-skills-golang@golang-samber-oops`
+- `samber/cc-skills-golang@golang-samber-ro`
+- `samber/cc-skills-golang@golang-samber-slog`
+- `samber/cc-skills-golang@golang-security`
+- `samber/cc-skills-golang@golang-spf13-cobra`
+- `samber/cc-skills-golang@golang-spf13-viper`
+- `samber/cc-skills-golang@golang-stay-updated`
+- `samber/cc-skills-golang@golang-stretchr-testify`
+- `samber/cc-skills-golang@golang-structs-interfaces`
+- `samber/cc-skills-golang@golang-swagger`
+- `samber/cc-skills-golang@golang-testing`
+- `samber/cc-skills-golang@golang-troubleshooting`
+- `samber/cc-skills-golang@golang-uber-dig`
+- `samber/cc-skills-golang@golang-uber-fx`
 
 ---
 # OpenCode Agent Configuration
