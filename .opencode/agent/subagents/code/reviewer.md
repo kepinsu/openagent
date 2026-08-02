@@ -76,7 +76,7 @@ task(subagent_type="ContextScout", description="Find code review standards", pro
 
 ## Required review skills
 
-The following Go skills are mandatory. They are resolved from `.opencode/skills/go/<skill>/SKILL.md`. Do not skip them to save context: always start with `golang-how-to`, then load every skill relevant to the requested task.:
+The following Go skills are mandatory. They are resolved from `.opencode/skills/go/<skill>/SKILL.md`. Do not skip them to save context: always start with `golang-how-to`, then load every skill relevant to the requested task:
 
 - samber/cc-skills-golang@golang-security
 - samber/cc-skills-golang@golang-safety
