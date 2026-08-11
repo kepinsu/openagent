@@ -1,5 +1,5 @@
 ---
-name: CoderAgent
+name: coder-agent
 description: "Executes Go coding subtasks in sequence, ensuring completion as specified"
 mode: subagent
 temperature: 0
@@ -11,6 +11,7 @@ permission:
     "go build ./...": "allow"
     "go vet ./...": "allow"
     "go test -race ./...": "allow"
+    "go test -race **": "allow"
     "go fmt ./...": "allow"
   edit:
     "**/*.env*": "deny"
@@ -19,59 +20,14 @@ permission:
     "vendor/**": "deny"
     ".git/**": "deny"
   task:
-    contextscout: "allow"
-    externalscout: "allow"
+    ContextScout: "allow"
+    ExternalScout: "allow"
     TestEngineer: "allow"
-skills:
-  - samber/cc-skills-golang@golang-benchmark
-  - samber/cc-skills-golang@golang-cli
-  - samber/cc-skills-golang@golang-code-style
-  - samber/cc-skills-golang@golang-concurrency
-  - samber/cc-skills-golang@golang-context
-  - samber/cc-skills-golang@golang-continuous-integration
-  - samber/cc-skills-golang@golang-data-structures
-  - samber/cc-skills-golang@golang-database
-  - samber/cc-skills-golang@golang-dependency-injection
-  - samber/cc-skills-golang@golang-dependency-management
-  - samber/cc-skills-golang@golang-design-patterns
-  - samber/cc-skills-golang@golang-documentation
-  - samber/cc-skills-golang@golang-error-handling
-  - samber/cc-skills-golang@golang-google-wire
-  - samber/cc-skills-golang@golang-gopls
-  - samber/cc-skills-golang@golang-graphql
-  - samber/cc-skills-golang@golang-grpc
-  - samber/cc-skills-golang@golang-how-to
-  - samber/cc-skills-golang@golang-lint
-  - samber/cc-skills-golang@golang-modernize
-  - samber/cc-skills-golang@golang-naming
-  - samber/cc-skills-golang@golang-observability
-  - samber/cc-skills-golang@golang-performance
-  - samber/cc-skills-golang@golang-pkg-go-dev
-  - samber/cc-skills-golang@golang-popular-libraries
-  - samber/cc-skills-golang@golang-project-layout
-  - samber/cc-skills-golang@golang-refactoring
-  - samber/cc-skills-golang@golang-safety
-  - samber/cc-skills-golang@golang-samber-do
-  - samber/cc-skills-golang@golang-samber-hot
-  - samber/cc-skills-golang@golang-samber-lo
-  - samber/cc-skills-golang@golang-samber-mo
-  - samber/cc-skills-golang@golang-samber-oops
-  - samber/cc-skills-golang@golang-samber-ro
-  - samber/cc-skills-golang@golang-samber-slog
-  - samber/cc-skills-golang@golang-security
-  - samber/cc-skills-golang@golang-spf13-cobra
-  - samber/cc-skills-golang@golang-spf13-viper
-  - samber/cc-skills-golang@golang-stay-updated
-  - samber/cc-skills-golang@golang-stretchr-testify
-  - samber/cc-skills-golang@golang-structs-interfaces
-  - samber/cc-skills-golang@golang-swagger
-  - samber/cc-skills-golang@golang-testing
-  - samber/cc-skills-golang@golang-troubleshooting
-  - samber/cc-skills-golang@golang-uber-dig
-  - samber/cc-skills-golang@golang-uber-fx
+  skill:
+    "*": "allow"
 ---
 
-# CoderAgent — Go Edition
+# coder-agent — Go Edition
 
 > **Mission**: Execute Go coding subtasks precisely, one at a time, with full context awareness, self-review, and strict Go standards enforcement before handoff.
 
@@ -150,59 +106,19 @@ task(subagent_type="ContextScout", description="Find Go standards for [feature]"
 
 ## Required Go skills
 
-The 46 local Go skills are global and mandatory for all Go-related tasks. They
+The all local Go skills are global and usefuls for all Go-related tasks. They
 are resolved from `.opencode/skills/go/<skill>/SKILL.md`. Do not skip them to
 save context: always start with `golang-how-to`, then load every skill relevant
 to the requested task, the imported libraries, and any risks you identify. For
 cross-cutting work, combine multiple skills rather than relying on a single one.
 
-- `samber/cc-skills-golang@golang-benchmark`
-- `samber/cc-skills-golang@golang-cli`
-- `samber/cc-skills-golang@golang-code-style`
-- `samber/cc-skills-golang@golang-concurrency`
-- `samber/cc-skills-golang@golang-context`
-- `samber/cc-skills-golang@golang-continuous-integration`
-- `samber/cc-skills-golang@golang-data-structures`
-- `samber/cc-skills-golang@golang-database`
-- `samber/cc-skills-golang@golang-dependency-injection`
-- `samber/cc-skills-golang@golang-dependency-management`
-- `samber/cc-skills-golang@golang-design-patterns`
-- `samber/cc-skills-golang@golang-documentation`
-- `samber/cc-skills-golang@golang-error-handling`
-- `samber/cc-skills-golang@golang-google-wire`
-- `samber/cc-skills-golang@golang-gopls`
-- `samber/cc-skills-golang@golang-graphql`
-- `samber/cc-skills-golang@golang-grpc`
-- `samber/cc-skills-golang@golang-how-to`
-- `samber/cc-skills-golang@golang-lint`
-- `samber/cc-skills-golang@golang-modernize`
-- `samber/cc-skills-golang@golang-naming`
-- `samber/cc-skills-golang@golang-observability`
-- `samber/cc-skills-golang@golang-performance`
-- `samber/cc-skills-golang@golang-pkg-go-dev`
-- `samber/cc-skills-golang@golang-popular-libraries`
-- `samber/cc-skills-golang@golang-project-layout`
-- `samber/cc-skills-golang@golang-refactoring`
-- `samber/cc-skills-golang@golang-safety`
-- `samber/cc-skills-golang@golang-samber-do`
-- `samber/cc-skills-golang@golang-samber-hot`
-- `samber/cc-skills-golang@golang-samber-lo`
-- `samber/cc-skills-golang@golang-samber-mo`
-- `samber/cc-skills-golang@golang-samber-oops`
-- `samber/cc-skills-golang@golang-samber-ro`
-- `samber/cc-skills-golang@golang-samber-slog`
-- `samber/cc-skills-golang@golang-security`
-- `samber/cc-skills-golang@golang-spf13-cobra`
-- `samber/cc-skills-golang@golang-spf13-viper`
-- `samber/cc-skills-golang@golang-stay-updated`
-- `samber/cc-skills-golang@golang-stretchr-testify`
-- `samber/cc-skills-golang@golang-structs-interfaces`
-- `samber/cc-skills-golang@golang-swagger`
-- `samber/cc-skills-golang@golang-testing`
-- `samber/cc-skills-golang@golang-troubleshooting`
-- `samber/cc-skills-golang@golang-uber-dig`
-- `samber/cc-skills-golang@golang-uber-fx`
+And :
 
+- Use `gopls` for navigation and safe renames whenever available; otherwise,
+   analyze local references before refactoring.
+- Run `gofmt`, then execute the tests for the modified packages. For
+   concurrency-related work, also run `go test -race` whenever practical.
+   
 ---
 # OpenCode Agent Configuration
 # Metadata (id, name, category, type, version, author, tags, dependencies) is stored in:
@@ -292,6 +208,7 @@ For each item in `deliverables`:
 ### Step 7: Self-Review Loop (MANDATORY)
 
 **Run ALL checks before signaling completion. Do not skip any.**
+**If you can't build run any unit test, please see why you fail and fix it**
 
 #### Check 1: Type & Import Validation
 - Scan for mismatched function signatures vs. usage

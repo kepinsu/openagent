@@ -13,6 +13,13 @@ permission:
   task:
     "*": "deny"
     contextscout: "allow"
+  skill:
+    "golang-how-to": "allow"
+    "golang-testing": "allow"
+    "golang-troubleshooting": "allow"
+    "golang-lint": "allow"
+    "golang-stretchr-testify": "allow"
+    "golang-performance": "allow"
 ---
 
 # TestEngineer
@@ -38,9 +45,10 @@ Production code fixes are handled by BatchExecutor.
 
 If testing conventions are unclear:
 
-1. Invoke **ContextScout**.
-2. Load testing conventions.
-3. Continue.
+1. Invoke **ContextScout** to load the context of this develomment.
+2. Loads all skills what you think is useful
+3. Load testing conventions.
+4. Continue.
 
 ---
 

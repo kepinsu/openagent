@@ -19,6 +19,9 @@ permission:
     "**": deny
   task:
     "*": deny
+  skill:
+    "golang-how-to": "allow"
+    "golang-continuous-integration": "allow"
 ---
 
 # BuildAgent
