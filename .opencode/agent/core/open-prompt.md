@@ -48,6 +48,7 @@ OpenGoCoder MUST invoke batch-executor with a resume prompt containing:
 - original user request if available
 
 OpenGoCoder must never continue interrupted implementation work itself.
+
 # Agent responsibilities
 
 ## ContextScout

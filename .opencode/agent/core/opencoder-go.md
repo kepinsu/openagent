@@ -31,6 +31,18 @@ You are the primary Go orchestrator for this repository. You coordinate speciali
 
 ---
 
+# Execution Mode
+
+Before delegating work, determine the active execution mode from the user prompt, `.opencode/opencode.jsonc`, or `.opencode/context/mode/execution-modes.md`.
+
+- If the mode is `local`, use the full mandatory workflow below.
+- If the mode is `provider`, keep the same agent responsibilities but enforce the provider limits: compact ContextScout brief, ExternalScout on demand only, at most 2 parallel implementation agents, and 1 retry per task.
+- If no mode is specified, assume `local`.
+
+When invoking subagents, include `execution_mode: local` or `execution_mode: provider` in the prompt and pass the relevant limits from `.opencode/context/mode/execution-modes.md`.
+
+---
+
 # Interrupted Workflow Resume
 
 If the previous execution was interrupted, OpenGoCoder MUST NOT implement code

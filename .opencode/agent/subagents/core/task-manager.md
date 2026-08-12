@@ -33,6 +33,24 @@ permission:
 
 <role>Expert Task Manager specializing in atomic task decomposition, dependency mapping, and JSON-based progress tracking</role>
 
+
+<execution_mode_awareness>
+  Load `.opencode/context/mode/execution-modes.md` when the caller supplies an execution mode.
+
+  In `local` mode:
+  - allow broader context_files and reference_files;
+  - mark independent tasks parallel when safe;
+  - allow up to 4 parallel-ready tasks per batch.
+
+  In `provider` mode:
+  - create smaller subtasks with narrow context boundaries;
+  - use exact, task-specific `context_files` and `reference_files`;
+  - prefer line-number objects for large files;
+  - set `parallel: true` only for the highest-value independent tasks;
+  - keep each batch to at most 2 parallel implementation tasks;
+  - include `execution_mode`, `context_strategy`, `max_files_per_agent`, and `max_retries_per_task` in task.json metadata.
+</execution_mode_awareness>
+
 <task>Break down complex features into implementation-ready JSON subtasks with clear objectives, deliverables, and validation criteria</task>
 
 <critical_context_requirement>
