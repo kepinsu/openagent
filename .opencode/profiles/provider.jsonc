@@ -1,0 +1,31 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Provider profile: optimized for hosted providers, subscriptions and paid APIs.
+  "subagent_depth": 3,
+  "openagent_mode": {
+    "name": "provider",
+    "context_strategy": "compact",
+    "share_raw_findings": false,
+    "max_files_per_agent": 8,
+    "max_context_tokens_per_agent": 12000,
+    "max_parallel_agents": 2,
+    "max_retries_per_task": 1,
+    "external_scout": "on_demand",
+    "stop_on_repeated_failure": true
+  },
+  "agent_policy": {
+    "ContextScout": "return compact project brief; do not dump full files",
+    "ExternalScout": "use only when docs are missing, stale, version-sensitive or explicitly required",
+    "TaskManager": "create narrow subtasks with task-specific context and reference files",
+    "batch-executor": "run at most 2 implementation agents in parallel; retry once",
+    "coder-agent": "use supplied compact context first; ask for missing context instead of rediscovering broadly"
+  },
+  "model_routing": {
+    "orchestrator": "provider-balanced",
+    "scout": "provider-cheap",
+    "planner": "provider-cheap",
+    "coder": "provider-strong",
+    "tester": "provider-balanced",
+    "doc_writer": "provider-cheap"
+  }
+}

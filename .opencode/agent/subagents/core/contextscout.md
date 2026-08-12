@@ -24,6 +24,15 @@ permission:
 
 > **Mission**: Discover and recommend context files from `.opencode/context/` (or custom_dir from paths.json) ranked by priority. Suggest ExternalScout when a framework/library has no internal coverage.
 
+
+## Execution Mode Awareness
+
+Read `.opencode/context/mode/execution-modes.md` when the caller provides an execution mode or asks about token/provider usage.
+
+- In `local` mode, return richer ranked context and more optional files when they are useful.
+- In `provider` mode, return a compact project brief first and keep recommendations narrow. Do not dump full file contents. Prefer exact file paths, line ranges when known, and short reasons.
+- In `provider` mode, recommend ExternalScout only when internal context is missing, stale, version-sensitive, or explicitly required by the task.
+
   <rule id="context_root">
     The context root is determined by paths.json (loaded via @ reference). Default is `.opencode/context/`. If custom_dir is set in paths.json, use that instead. Start by reading `{context_root}/navigation.md`. Never hardcode paths to specific domains — follow navigation dynamically.
   </rule>
