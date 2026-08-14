@@ -42,6 +42,22 @@ Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `
 - In `provider` mode, call ExternalScout only for external packages whose current API is unknown, version-sensitive, missing from cached docs, or explicitly requested.
 - In `provider` mode, keep completion reports compact and avoid repeating the full task context back to the caller.
 
+
+## Completion and Escalation
+
+Each CoderAgent invocation executes exactly one TaskManager subtask contract.
+Continue working until that contract satisfies its acceptance criteria and its
+required validation command has run.
+
+Never return a "Remaining Work" list as a progress update.
+Never ask "Shall I continue?" or ask the caller or user to select tasks.
+No continuation decision belongs to CoderAgent.
+
+If the received slice contains zero or multiple task contracts, report a
+contract violation to batch-executor and do not choose or execute a task.
+
+If a concrete blocker prevents completion, return `blocked` with the exact
+missing input, failing command, or unavailable dependency to batch-executor.
 ## Validation-Fix Mode
 
 When the prompt contains `execution_route: validation-fix`, the supplied original subtask contract remains authoritative and only the validation delta is new context.

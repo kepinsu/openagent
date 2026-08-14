@@ -258,6 +258,13 @@ The prompt to `coder-agent` MUST say that this context slice is the complete wor
 
 The prompt MUST also state that `coder-agent` is to implement only this contract and may request more context only when a concrete required item is missing from the slice.
 
+
+Before delegation, batch-executor MUST verify that the context slice contains
+exactly one TaskManager subtask contract and task ID.
+
+If a slice contains zero or multiple task contracts, do not delegate it.
+Report the contract violation and affected task IDs to the caller; do not ask
+the caller or user to choose which task should run.
 Wait for completion.
 
 ---
