@@ -20,9 +20,9 @@ permission:
     "vendor/**": "deny"
     ".git/**": "deny"
   task:
-    ContextScout: "allow"
-    ExternalScout: "allow"
-    TestEngineer: "allow"
+    contextscout: "allow"
+    externalscout: "allow"
+    test-engineer: "allow"
   skill:
     "*": "allow"
 ---
@@ -117,7 +117,7 @@ The supplied subtask contract is your primary context. Call ContextScout only wh
 ### How to Invoke
 
 ```
-task(subagent_type="ContextScout", description="Find Go standards for [feature]", prompt="Find Go coding standards, package patterns, and naming conventions needed to implement [feature]. I need patterns for [concrete scenario].")
+task(subagent_type="contextscout", description="Find Go standards for [feature]", prompt="Find Go coding standards, package patterns, and naming conventions needed to implement [feature]. I need patterns for [concrete scenario].")
 ```
 
 ### After ContextScout Returns
@@ -174,7 +174,7 @@ This step ensures your implementation is consistent with how the project already
 Do this only when a concrete required item is missing from the supplied slice. Ask for that item narrowly; do not use ContextScout to rediscover the full project:
 
 ```
-task(subagent_type="ContextScout", description="Find context for [subtask title]", prompt="Find coding standards, patterns, and conventions for implementing [subtask title]. Check for security patterns, naming conventions, and any relevant guides.")
+task(subagent_type="contextscout", description="Find context for [subtask title]", prompt="Find coding standards, patterns, and conventions for implementing [subtask title]. Check for security patterns, naming conventions, and any relevant guides.")
 ```
 
 Load every file ContextScout recommends. Apply those standards.
@@ -184,7 +184,7 @@ Load every file ContextScout recommends. Apply those standards.
 Use the supplied external documentation first. Invoke ExternalScout only when the needed API detail is unknown, version-sensitive, missing from supplied docs, or explicitly requested:
 
 ```
-task(subagent_type="ExternalScout", description="Fetch [Library] docs", prompt="Fetch current docs for [Library]: [what I need to know]. Context: [what I'm building]")
+task(subagent_type="externalscout", description="Fetch [Library] docs", prompt="Fetch current docs for [Library]: [what I need to know]. Context: [what I'm building]")
 ```
 
 ### Step 5: Check Import Graph for Cycles (MANDATORY for new packages/files)

@@ -1,5 +1,5 @@
 ---
-name: TestEngineer
+name: test-engineer
 description: "Validate implementation by writing and running tests."
 mode: subagent
 temperature: 0.1
@@ -30,7 +30,7 @@ You are responsible for validating implementations through automated tests. You 
 
 # Responsibilities
 
-TestEngineer is responsible for:
+test-engineer is responsible for:
 
 - understanding project testing conventions;
 - writing or updating tests;
@@ -45,7 +45,7 @@ Production code fixes are handled by BatchExecutor.
 
 If testing conventions are unclear:
 
-1. Invoke **ContextScout** to load the context of this develomment.
+1. Invoke `contextscout` to load the context of this development.
 2. Loads all skills what you think is useful
 3. Load testing conventions.
 4. Continue.
