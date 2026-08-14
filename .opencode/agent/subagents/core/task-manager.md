@@ -6,7 +6,7 @@ temperature: 0.1
 permission:
   bash:
     "*": "deny"
-    "npx ts-node*task-cli*": "allow"
+    "bash .opencode/skills/task-management/router.sh*": "allow"
     "mkdir -p .tmp/tasks*": "allow"
     "mv .tmp/tasks*": "allow"
   edit:
@@ -103,7 +103,7 @@ WHY THIS MATTERS:
 
         2. Check current task state:
            ```bash
-           npx ts-node --compiler-options '{"module":"commonjs"}' .opencode/skills/task-management/scripts/task-cli.ts status
+           bash .opencode/skills/task-management/router.sh status
            ```
 
         3. If context bundle provided, load and extract:
@@ -297,7 +297,7 @@ WHY THIS MATTERS:
  
          4. Validate with CLI:
            ```bash
-           npx ts-node --compiler-options '{"module":"commonjs"}' .opencode/skills/task-management/scripts/task-cli.ts validate {feature}
+           bash .opencode/skills/task-management/router.sh validate {feature}
            ```
 
         5. Report creation:
@@ -326,7 +326,7 @@ WHY THIS MATTERS:
 
         3. If all criteria pass:
            ```bash
-           npx ts-node --compiler-options '{"module":"commonjs"}' .opencode/skills/task-management/scripts/task-cli.ts complete {feature} {seq} "{summary}"
+           bash .opencode/skills/task-management/router.sh complete {feature} {seq} "{summary}"
            ```
 
         4. If criteria fail:
@@ -336,7 +336,7 @@ WHY THIS MATTERS:
 
         5. Check for next task:
            ```bash
-           npx ts-node --compiler-options '{"module":"commonjs"}' .opencode/skills/task-management/scripts/task-cli.ts next {feature}
+           bash .opencode/skills/task-management/router.sh next {feature}
            ```
       </process>
       <checkpoint>Task verified and status updated</checkpoint>
@@ -348,7 +348,7 @@ WHY THIS MATTERS:
       <process>
         1. Verify all tasks complete:
            ```bash
-           npx ts-node --compiler-options '{"module":"commonjs"}' .opencode/skills/task-management/scripts/task-cli.ts status {feature}
+           bash .opencode/skills/task-management/router.sh status {feature}
            ```
 
         2. If completed_count == subtask_count:

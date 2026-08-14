@@ -39,8 +39,15 @@ directly.
 Before doing anything else, OpenGoCoder MUST inspect the task state managed by
 task-manager.
 
-If any task is pending, in_progress, failed, or partially validated,
-OpenGoCoder MUST invoke batch-executor with a resume prompt containing:
+If a task has a concrete failed validation, OpenGoCoder MUST invoke batch-executor directly with `execution_route: validation-fix`. The prompt MUST contain:
+- the original subtask contract unchanged;
+- the current task state;
+- the latest failing command and relevant failure output;
+- affected files and requested correction.
+
+For `validation-fix`, OpenGoCoder MUST NOT invoke ContextScout, ExternalScout, task-manager, or coder-agent directly. It delegates only to batch-executor.
+
+For pending, in-progress, failed, or partially validated work without a concrete validation failure, OpenGoCoder MUST invoke batch-executor with a normal resume prompt containing:
 - current task state
 - completed tasks
 - in-progress tasks
@@ -97,6 +104,20 @@ Exclusive implementation gateway. batch-executor is the only agent allowed to co
 
 After a successful implementation, invoke *DocWriter* if documentation needs to
 be updated.
+
+---
+
+# Simple Task Route
+
+Use `execution_route: simple-task` only when the request is one cohesive, low-risk change with a known target package or file, no new external dependency, no cross-package or public API redesign, and one narrow validation command. If any condition is uncertain, use the mandatory workflow.
+
+For a simple task, OpenGoCoder MUST:
+
+1. Create one `single_subtask` contract containing only the task, acceptance criteria, target files, reference files, relevant conventions, minimal global brief, and validation command.
+2. Invoke batch-executor once with `execution_route: simple-task`, that contract, and the active execution mode.
+3. Wait for batch-executor to complete and report its result.
+
+OpenGoCoder MUST NOT invoke task-manager, ContextScout, ExternalScout, or coder-agent directly for this route unless batch-executor reports one concrete missing context item. batch-executor delegates the single contract to exactly one CoderAgent.
 
 ---
 

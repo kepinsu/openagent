@@ -42,6 +42,17 @@ Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `
 - In `provider` mode, call ExternalScout only for external packages whose current API is unknown, version-sensitive, missing from cached docs, or explicitly requested.
 - In `provider` mode, keep completion reports compact and avoid repeating the full task context back to the caller.
 
+## Validation-Fix Mode
+
+When the prompt contains `execution_route: validation-fix`, the supplied original subtask contract remains authoritative and only the validation delta is new context.
+
+1. Do not call ContextScout or ExternalScout, load broad skills, rebuild the import graph, reread unrelated reference files, or update task status.
+2. Inspect only the files named by the failure and the contract's target or reference files.
+3. Apply the smallest correction that addresses the reported failure. Do not redesign the feature, expand the task, or create unrelated tests.
+4. Run only the supplied narrow validation command, then return the changed files, command result, and a compact `fix_ready` summary to batch-executor.
+
+The normal workflow steps for context discovery, status updates, and full self-review do not apply to `validation-fix`. This mode overrides the generic ContextScout, external-package, skill-loading, and task-status rules below. Batch-executor owns the next validation cycle and task state.
+
 <critical_rules priority="absolute" enforcement="strict">
   <rule id="context_first">
     Before writing Go code, verify that the supplied slice covers the standards, naming conventions, security patterns, and Go idioms required by the subtask. If one concrete item is missing, call ContextScout only for that item. Do not perform broad project rediscovery.
@@ -50,7 +61,7 @@ Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `
     Call ExternalScout only when an external package's current API is unknown, version-sensitive, absent from the supplied documentation, or explicitly requested. Request only the API details needed for this subtask.
   </rule>
   <rule id="self_review_required">
-    NEVER signal completion without running the Self-Review Loop (Step 7). Every deliverable must pass go vet, import verification, anti-pattern scan, circular dependency check, and acceptance criteria verification.
+    For standard implementation, NEVER signal completion without running the Self-Review Loop (Step 7). In `validation-fix` mode, run only the supplied narrow validation command and report `fix_ready` to batch-executor.
   </rule>
   <rule id="task_order">
     Execute subtasks in the defined sequence. Do not skip or reorder. Complete one fully before starting the next.

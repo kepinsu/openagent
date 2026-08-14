@@ -113,11 +113,32 @@ batch-executor receives:
 - dependency graph;
 - context summary;
 - acceptance criteria;
-- relevant files.
+- relevant files;
+- optional `execution_route`: `standard`, `simple-task`, or `validation-fix`;
+- optional `single_subtask` contract for `simple-task`;
+- original subtask contract and validation delta for `validation-fix`.
 
 batch-executor MUST execute the received plan.
 
 batch-executor MUST NOT redesign or replace the execution plan.
+
+---
+
+# Execution Routes
+
+## simple-task
+
+When `execution_route: simple-task` is supplied, treat `single_subtask` as the complete one-task execution plan. Do not invoke TaskManager, ContextScout, or ExternalScout unless the contract lacks one concrete required item. Delegate exactly one CoderAgent and validate that one task through the normal validation step.
+
+## validation-fix
+
+When `execution_route: validation-fix` is supplied, do not restart planning or discovery. Delegate exactly one CoderAgent with:
+
+- the original subtask contract unchanged;
+- the narrow context slice for its target and reference files;
+- the latest validation command, failure output, affected files, and requested correction.
+
+The CoderAgent prompt MUST include `execution_route: validation-fix`. It must repair only the reported failure and run the supplied narrow validation command. Afterward, run TestEngineer and reviewer for the same subtask. Do not convert this route into a standard implementation retry. This route overrides the generic Context Resolution and standard retry workflow below.
 
 ---
 
@@ -227,8 +248,9 @@ If validation fails:
 
 - collect the validation report;
 - extract only the failure details relevant to the current task;
-- invoke *coder-agent* again with a fresh context slice;
-- include only the latest validation failure, affected files and requested corrections.
+- invoke *coder-agent* again with `execution_route: validation-fix` and a fresh context slice;
+- include only the original subtask contract, latest validation failure, affected files, requested corrections, and narrow validation command.
+- do not restart TaskManager, ContextScout, ExternalScout, or the full CoderAgent workflow.
 
 Repeat until validation succeeds or retry limit is reached.
 
