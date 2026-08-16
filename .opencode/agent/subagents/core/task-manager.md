@@ -248,7 +248,8 @@ WHY THIS MATTERS:
                 "context_files": ["{standards paths relevant to THIS subtask}"],
                 "reference_files": ["{source files relevant to THIS subtask}"],
                 "acceptance_criteria": ["{criteria}"],
-                "deliverables": ["{files/endpoints}"],
+                "deliverables": ["{files to create or modify}"],
+                "validation_command": "{narrow command that validates this subtask}",
                 "bounded_context": "{optional: inherited from task.json or subtask-specific}",
                 "module": "{optional: module this subtask modifies}",
                 "vertical_slice": "{optional: feature slice this subtask belongs to}",
@@ -258,7 +259,7 @@ WHY THIS MATTERS:
               }
               ```
   
-              **RULE**: `context_files` = standards/conventions ONLY. `reference_files` = project source files ONLY. Never mix them.
+              **RULE**: `context_files` = standards/conventions ONLY. `reference_files` = project source files ONLY. `deliverables` MUST be repository file paths, not endpoints or prose. `validation_command` is mandatory and must validate this subtask without running unrelated work. Never mix these fields.
   
               **LINE-NUMBER PRECISION** (Enhanced Schema):
               For large files (>100 lines), use line-number precision to reduce cognitive load:
@@ -307,7 +308,15 @@ WHY THIS MATTERS:
            Location: .tmp/tasks/{feature}/
            Files: task.json + {N} subtasks
 
-           Next available: Run `task-cli.ts next {feature}`
+           Artifact contract for batch-executor:
+           feature: {feature-slug}
+           task_root: .tmp/tasks/{feature-slug}/
+           task_json_path: .tmp/tasks/{feature-slug}/task.json
+           subtask_paths:
+           - .tmp/tasks/{feature-slug}/subtask_01.json
+           - ... one path for every generated subtask
+
+           Next available: Run `task-cli.ts next --json {feature}`
            ```
       </process>
       <checkpoint>All JSON files created and validated</checkpoint>

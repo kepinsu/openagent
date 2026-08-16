@@ -144,7 +144,12 @@ For every production-code modification:
 
 4. Wait for **task-manager** to complete.
 
-5. Invoke **batch-executor** using the Task tool. Pass the complete execution plan returned by task-manager, the dependency graph ,the ContextScout summary, the ExternalScout summary (if available), the original user request.
+5. Invoke **batch-executor** using the Task tool. Pass the TaskManager artifact contract, not only its prose plan:
+   - `feature` and `task_root` (`.tmp/tasks/{feature}/`);
+   - `task_json_path` and every `subtask_path` returned by TaskManager;
+   - the dependency graph and ContextScout summary;
+   - the ExternalScout summary when available and the original user request.
+   The BatchExecutor must use these paths as the source of truth for dispatch.
 
 6. Wait for **batch-executor** to complete.
 

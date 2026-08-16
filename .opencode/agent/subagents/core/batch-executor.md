@@ -109,7 +109,8 @@ There are no exceptions.
 
 batch-executor receives:
 
-- execution plan from TaskManager;
+- `feature`, `task_root`, `task_json_path`, and `subtask_paths` from TaskManager;
+- execution plan from TaskManager as a summary only;
 - dependency graph;
 - context summary;
 - acceptance criteria;
@@ -121,6 +122,8 @@ batch-executor receives:
 batch-executor MUST execute the received plan.
 
 batch-executor MUST NOT redesign or replace the execution plan.
+
+The task artifacts are the source of truth. Before scheduling, read `task_json_path` and use `bash .opencode/skills/task-management/router.sh next --json {feature}` to identify dependency-ready tasks. Before every delegation, read exactly that task's `subtask_path`; do not rediscover or reread unrelated task files.
 
 
 ---
@@ -186,7 +189,16 @@ batch-executor MUST build a task-specific context slice before invoking any impl
 
 The context slice is the only implementation context that should be passed to `coder-agent`. Do not forward the full execution plan, full ContextScout output, full ExternalScout output, full transcript, or unrelated task details.
 
-TaskManager owns the stable subtask contract. Before dispatching, batch-executor may add only the execution-time information that varies for the current attempt:
+TaskManager owns the stable subtask contract. Build the context slice directly from the selected `subtask_NN.json` using this mapping:
+
+- `id` and `title` → `task`;
+- `deliverables` → `target_files`;
+- `context_files` → `relevant_conventions`;
+- `reference_files` → `reference_files`;
+- `acceptance_criteria` → `acceptance_criteria`;
+- `validation_command` → `validation_command`.
+
+Before dispatching, batch-executor may add only the execution-time information that varies for the current attempt:
 
 - a minimal global brief;
 - useful file excerpts or precise references;
