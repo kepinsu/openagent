@@ -109,7 +109,7 @@ There are no exceptions.
 
 batch-executor receives:
 
-- `feature`, `task_root`, `task_json_path`, and `subtask_paths` from TaskManager;
+- feature, task_root, task_json_path, and every subtask_path from TaskManager;
 - execution plan from TaskManager as a summary only;
 - dependency graph;
 - context summary;
@@ -123,12 +123,50 @@ batch-executor MUST execute the received plan.
 
 batch-executor MUST NOT redesign or replace the execution plan.
 
-The task artifacts are the source of truth. Before scheduling, read `task_json_path` and use `bash .opencode/skills/task-management/router.sh next --json {feature}` to identify dependency-ready tasks. Before every delegation, read exactly that task's `subtask_path`; do not rediscover or reread unrelated task files.
+The task artifacts are the source of truth. Read task_json_path once, then use the task-management router next --json {feature} command to identify dependency-ready tasks. Before every delegation, read exactly that ready task's subtask_path; do not rediscover or reread unrelated task files.
+
+# Mandatory Scheduler Query
+
+For every standard-route invocation, the first scheduling tool call MUST be exactly:
+  bash .opencode/skills/task-management/router.sh next --json {feature}
+
+Make this call before reading any subtask JSON, reference file, source file, or running any validation command. Use its machine-readable output to choose the ready frontier. If the command fails, returns invalid JSON, or names no ready task while work remains, return blocked: scheduler_query_failed and do not explore or implement. The Bash call and its output must be visible in the execution trace.
+
+# Execution Read Budget
+
+Do not read every subtask JSON, phase, or source file to gain a comprehensive picture. The task JSON plus next --json is sufficient to schedule work. Read only the ready subtask artifacts returned by next --json, and only when building that CoderAgent contract.
+
+Never read a subtask's reference_files, deliverables, or source files yourself. Put those paths in that one CoderAgent's context slice; the CoderAgent owns implementation discovery. Do not run a preflight build or validation command before delegation. The CoderAgent runs the subtask validation command, and batch-executor only performs its post-delegation completion verification.
+
+After obtaining the first ready frontier, dispatch it immediately. Do not narrate a plan, repeat the dependency graph, or delay dispatch for additional exploration.
 
 
+
+# Artifact Gate
+
+For `execution_route: standard`, `feature`, `task_root`, `task_json_path`, and
+at least one `subtask_path` are mandatory. Verify that these paths exist before
+scheduling or delegating work.
+
+An inline "Task Contract", "Phase", "Execution Steps", or a label such as
+`subtask_01.json` is not a TaskManager artifact and MUST NOT be used as a
+substitute for the required paths.
+
+If the artifact contract is missing, invalid, or points outside `task_root`:
+
+- do not infer a feature or task path;
+- do not create a replacement plan from the caller's prose;
+- do not invoke `coder-agent`, `test-engineer`, or `reviewer`;
+- return exactly `blocked: task_artifacts_missing`, followed by the missing or
+  invalid fields and the required TaskManager handoff format.
+
+This gate does not apply to `simple-task` or `validation-fix`, whose contracts
+are supplied explicitly by their respective routes.
 ---
 
 # Autonomous Dispatch
+
+For a standard route, OpenGoCoder supplies the complete TaskManager artifact contract once. Own the feature execution loop: select all dependency-ready tasks from that contract, dispatch them according to their parallel flags and execution-mode limit, wait and validate results, then resolve the next dependency frontier. Return only when the complete feature plan succeeds or a task is blocked.
 
 The received execution plan is authorization to execute. Start execution as
 soon as the plan is complete enough to identify a dependency-ready task.
@@ -154,6 +192,8 @@ planning or prioritization question.
 # Execution Routes
 
 ## simple-task
+
+simple-task is valid only for a new, standalone one-task request. If its input contains feature, task_root, task_json_path, subtask_path, subtask_paths, subtask_id, a phase or batch label, or a dependency graph, return exactly blocked: invalid_simple_task_route and do not delegate work. Those fields identify TaskManager-managed work and MUST use the standard route and the Artifact Gate.
 
 When `execution_route: simple-task` is supplied, treat `single_subtask` as the complete one-task execution plan. Do not invoke TaskManager, ContextScout, or ExternalScout unless the contract lacks one concrete required item. Delegate exactly one CoderAgent and validate that one task through the normal validation step.
 

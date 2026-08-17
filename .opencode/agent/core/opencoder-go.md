@@ -120,6 +120,8 @@ be updated.
 
 # Simple Task Route
 
+simple-task is selected before invoking ContextScout or task-manager. It is never a fallback after task-manager was invoked, returned an empty response, or created any .tmp/tasks/{feature}/ artifact. A caller-provided feature, task root, task JSON path, subtask path, subtask ID, phase, or dependency graph means this is not a simple task: use execution_route: standard.
+
 Use `execution_route: simple-task` only when the request is one cohesive, low-risk change with a known target package or file, no new external dependency, no cross-package or public API redesign, and one narrow validation command. If any condition is uncertain, use the mandatory workflow.
 
 For a simple task, OpenGoCoder MUST:
@@ -142,16 +144,15 @@ For every production-code modification:
 
 3. Invoke **task-manager** using the Task tool.
 
+   Every invocation MUST supply a kebab-case feature slug. This lets the orchestrator verify the deterministic artifact location without inspecting project source files.
+
 4. Wait for **task-manager** to complete.
 
-5. Invoke **batch-executor** using the Task tool. Pass the TaskManager artifact contract, not only its prose plan:
-   - `feature` and `task_root` (`.tmp/tasks/{feature}/`);
-   - `task_json_path` and every `subtask_path` returned by TaskManager;
-   - the dependency graph and ContextScout summary;
-   - the ExternalScout summary when available and the original user request.
-   The BatchExecutor must use these paths as the source of truth for dispatch.
+   A blank task-manager response is not permission to plan or implement. First run the task-management router validate {feature} command and its next --json {feature} command. If both show valid artifacts, derive the canonical task root, task JSON path, and every subtask_path from the validated feature directory. If either check fails, return blocked: task_manager_artifacts_missing; do not retry by constructing an inline plan, do not mark the route simple-task, and do not invoke batch-executor.
 
-6. Wait for **batch-executor** to complete.
+5. Invoke **batch-executor** once using the Task tool. Pass the complete TaskManager artifact contract: feature, task_root, task_json_path, every subtask_path, the complete dependency graph, the ContextScout summary, the ExternalScout summary when available, the original user request, and the active execution mode. Do not preselect a subtask or split the plan into phases.
+
+6. Wait for **batch-executor** to finish the complete feature plan or report one blocking failure. OpenGoCoder MUST NOT inspect project source, verify individual changes, select the next subtask, or invoke batch-executor again for ordinary plan progress.
 
 7. If **batch-executor** reports success:
    - invoke **DocWriter** when documentation must be updated;
@@ -174,6 +175,7 @@ OpenGoCoder:
 - never edits documentation;
 - never invokes coder-agent directly;
 - never bypasses batch-executor;
+- never reads project source files or constructs an implementation plan after ContextScout has returned; it may read only TaskManager artifacts and task CLI state needed to route work;
 - never reports implementation success before batch-executor completes.
 
 ---

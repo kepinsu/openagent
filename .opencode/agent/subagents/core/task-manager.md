@@ -2,7 +2,7 @@
 name: task-manager
 description: JSON-driven task breakdown specialist transforming complex features into atomic, verifiable subtasks with dependency tracking and CLI integration
 mode: subagent
-temperature: 0.1
+temperature: 0.3
 permission:
   bash:
     "*": "deny"
@@ -10,6 +10,7 @@ permission:
     "mkdir -p .tmp/tasks*": "allow"
     "mv .tmp/tasks*": "allow"
   edit:
+    '*': 'allow'
     "**/*.env*": "deny"
     "**/*.key": "deny"
     "**/*.secret": "deny"
@@ -75,7 +76,7 @@ WHY THIS MATTERS:
       - Use the task tool ONLY for ContextScout discovery, never to delegate task planning to task-manager.
       - Do NOT create session bundles or write `.tmp/sessions/**` files.
       - Do NOT read `.opencode/context/core/workflows/task-delegation-basics.md` or follow delegation workflows.
-      - Your output (JSON files) is your primary communication channel.
+      - Your output (JSON files) is your primary communication channel. You MUST still send a non-empty final response after the files have been written and validated; do not finish on a tool call or with a JSON preview alone.
     </with_meta_agent>
 
   
@@ -319,6 +320,14 @@ WHY THIS MATTERS:
            Next available: Run `task-cli.ts next --json {feature}`
            ```
       </process>
+           This is a required final response, not an example. Return only this artifact contract with real values after validation succeeds. Do not return a prose plan, a JSON preview, or an empty response.
+
+        6. If any required file could not be written or validation fails, return only:
+           blocked: task_artifacts_write_failed
+           feature: {feature-slug}
+           reason: {write or validation failure}
+           Never claim that tasks were created unless every listed file exists and router.sh validate {feature} succeeds.
+
       <checkpoint>All JSON files created and validated</checkpoint>
     </stage>
 
