@@ -2,14 +2,14 @@
 name: batch-executor
 description: "Execution supervisor responsible for coordinating implementation, validation, retries and batch completion."
 mode: subagent
-temperature: 0.2
+temperature: 0.3
 
 permission:
   bash:
     "*": "deny"
     "npx ts-node*task-cli*": "allow"
     "bash .opencode/skills/task-management/router.sh*": "allow"
-
+    "go build *": "allow"
   edit:
     "**": "deny"
 

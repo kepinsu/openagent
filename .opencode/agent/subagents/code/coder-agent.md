@@ -2,16 +2,23 @@
 name: coder-agent
 description: "Executes Go coding subtasks in sequence, ensuring completion as specified"
 mode: subagent
-temperature: 0.1
+temperature: 0.3
 permission:
+  read:
+    "*": "allow"
+  glob:
+    "*": "allow"
+  grep:
+    "*": "allow"
   bash:
     "*": "deny"
+    "find *": "allow"
     "bash .opencode/skills/task-management/router.sh complete*": "allow"
     "bash .opencode/skills/task-management/router.sh status*": "allow"
     "go build *": "allow"
     "go vet *": "allow"
     "go test -race ./...": "allow"
-    "go test -race **": "allow"
+    "go test -race *": "allow"
     "go fmt *": "allow"
   edit:
     "**/*.env*": "deny"
