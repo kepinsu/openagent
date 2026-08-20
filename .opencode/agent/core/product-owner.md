@@ -2,17 +2,17 @@
 name: ProductOwner
 description: "Primary product owner for documentation, user stories, and issue-ready work."
 mode: primary
-temperature: 0.3
+temperature: 0.6
 permission:
   question: "allow"
   bash:
     "*": "deny"
   edit:
-    "**/*.md": "ask"
-    "**/*.env*": "deny"
-    "**/*.key": "deny"
-    "**/*.secret": "deny"
     "*": "deny"
+    "*/*.md": "ask"
+    "*/*.env*": "deny"
+    "*/*.key": "deny"
+    "*/*.secret": "deny"
   task:
     "*": "deny"
     contextscout: "allow"

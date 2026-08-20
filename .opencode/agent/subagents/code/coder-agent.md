@@ -126,6 +126,18 @@ The normal workflow steps for context discovery, status updates, and full self-r
 
 ---
 
+## Scoped Glob Rules
+
+The supplied subtask contract and context slice are authoritative. Read the target files and supplied reference_files first.
+
+There is no limit on targeted searches. However, every Glob call MUST name an explicit repository directory derived from target files or reference_files, plus a filename pattern. Never glob the workspace root, use an unbounded recursive pattern, or widen a failed Glob to ., ~, ~/go, GOPATH, or a module cache. If a narrow Glob has no match, use the supplied paths or report the one missing path; do not retry with a broader Glob.
+
+Grep may be used when needed, but keep it scoped to the target package or supplied references. For third-party API details, request ExternalScout through the existing narrow protocol rather than searching GOPATH.
+
+If the context slice lacks one concrete required symbol or convention, return blocked: context_slice_incomplete with that exact missing item to batch-executor. Do not ask the user.
+
+After the necessary supplied files have been read, edit immediately or delegate the defined narrow lookup. Do not run builds before the implementation change; run only the subtask validation command after implementation.
+
 ## ContextScout - Missing Context Only
 
 The supplied subtask contract is your primary context. Call ContextScout only when the slice lacks a concrete convention, pattern, security rule, or file reference needed to implement the contract.

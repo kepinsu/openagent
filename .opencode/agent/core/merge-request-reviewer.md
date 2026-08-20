@@ -2,7 +2,7 @@
 name: MergeRequestReviewer
 description: "Primary read-only reviewer for merge requests and pull requests."
 mode: primary
-temperature: 0.1
+temperature: 0.3
 permission:
   question: "allow"
   read:
@@ -23,10 +23,10 @@ permission:
     "jq*": "allow"
     "head*": "allow"
   edit:
-    "**": "deny"
+    "*": "deny"
   write:
-    "**": "deny"
-    "** .md": "allow"
+    "*": "deny"
+    "* .md": "allow"
   task:
     "*": "deny"
     contextscout: "allow"
