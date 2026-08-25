@@ -2,7 +2,7 @@
 
 # OpenAgent Context Navigation
 
-> Entry point for all context discovery. ContextScout starts here, then follows the areas relevant to the request.
+> Entry point for all context discovery. contextscout starts here, then follows the areas relevant to the request.
 
 ## Discovery Order
 
@@ -15,7 +15,7 @@
 
 | Area | Path | Priority | Use When |
 |------|------|----------|----------|
-| Core system | `.opencode/context/core/navigation.md` | Critical | Understanding ContextScout, orchestration, task flow, and context lifecycle |
+| Core system | `.opencode/context/core/navigation.md` | Critical | Understanding contextscout, orchestration, task flow, and context lifecycle |
 | Project intelligence | `.opencode/context/project-intelligence/navigation.md` | High | Understanding domain, architecture, decisions, and current notes |
 | Standards | `.opencode/context/standards/code.md` | High | Planning or implementing Go code |
 | Execution modes | `.opencode/context/mode/execution-modes.md` | Medium | Caller mentions local/provider mode, cost, token usage, or retry limits |

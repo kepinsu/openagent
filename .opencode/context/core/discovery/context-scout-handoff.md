@@ -1,13 +1,13 @@
 <!-- Context: core/discovery/context-scout-handoff | Priority: critical | Version: 1.0 | Updated: 2026-08-12 -->
 
-# ContextScout Handoff
+# contextscout Handoff
 
 > Output contract used by OpenGoCoder, task-manager, and batch-executor.
 
 ## Required Shape
 
 ```markdown
-# ContextScout Handoff
+# contextscout Handoff
 
 ## Request Understanding
 - intent: ...
@@ -66,13 +66,13 @@ TaskManager:
 
 - Use `context_files` for standards and constraints.
 - Use `reference_files` for implementation examples and source material.
-- Do not copy all ContextScout output into every subtask. Narrow context per task.
+- Do not copy all contextscout output into every subtask. Narrow context per task.
 
 BatchExecutor:
 
 - Pass only task-specific context to each implementation agent.
 - In provider mode, honor `max_files_per_agent`.
-- Re-run ContextScout for a task only when a subtask lacks enough context or validation reveals a hidden dependency.
+- Re-run contextscout for a task only when a subtask lacks enough context or validation reveals a hidden dependency.
 
 OpenGoCoder:
 

@@ -24,8 +24,8 @@
 
 | Need | File | Priority |
 |------|------|----------|
-| Run ContextScout correctly | `discovery/context-scout-job.md` | Critical |
-| Format ContextScout output | `discovery/context-scout-handoff.md` | Critical |
+| Run contextscout correctly | `discovery/context-scout-job.md` | Critical |
+| Format contextscout output | `discovery/context-scout-handoff.md` | Critical |
 | Understand context inventory | `context-system/catalog.md` | High |
 | Maintain context navigation | `context-system/navigation.md` | High |
 | Create implementation task JSON | `task-management/task-schema.md` | High |
@@ -33,7 +33,7 @@
 
 ## Integration
 
-- `OpenGoCoder` invokes `ContextScout` before task planning.
-- `task-manager` consumes ContextScout handoff as `context_files` and `reference_files`.
+- `OpenGoCoder` invokes `contextscout` before task planning.
+- `task-manager` consumes contextscout handoff as `context_files` and `reference_files`.
 - `batch-executor` passes bounded context to implementation agents.
 - `ContextManager` maintains this tree when the context system changes.

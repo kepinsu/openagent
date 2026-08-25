@@ -8,8 +8,8 @@
 
 | Area | Path | Owner Agent | Status | Notes |
 |------|------|-------------|--------|-------|
-| Root navigation | `.opencode/context/navigation.md` | ContextManager | Active | Entry point for ContextScout |
-| Core discovery | `.opencode/context/core/discovery/` | ContextScout | Active | Job and handoff contract |
+| Root navigation | `.opencode/context/navigation.md` | ContextManager | Active | Entry point for contextscout |
+| Core discovery | `.opencode/context/core/discovery/` | contextscout | Active | Job and handoff contract |
 | Context system | `.opencode/context/core/context-system/` | ContextManager | Active | Catalog and maintenance rules |
 | Task management | `.opencode/context/core/task-management/` | task-manager | Active | Task lifecycle and JSON schema |
 | Project intelligence | `.opencode/context/project-intelligence/` | ContextManager | Active | Business and technical context |

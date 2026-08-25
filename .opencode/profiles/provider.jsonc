@@ -14,7 +14,7 @@
     "stop_on_repeated_failure": true
   },
   "agent_policy": {
-    "ContextScout": "return compact project brief; do not dump full files",
+    "contextscout": "return compact project brief; do not dump full files",
     "ExternalScout": "use only when docs are missing, stale, version-sensitive or explicitly required",
     "TaskManager": "create narrow subtasks with task-specific context and reference files",
     "batch-executor": "run at most 2 implementation agents in parallel; retry once",

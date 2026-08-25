@@ -55,7 +55,7 @@ Recommended limits:
 
 ## Compact Context Contract
 
-In provider mode, ContextScout should return a compact project brief with:
+In provider mode, contextscout should return a compact project brief with:
 
 - relevant architecture;
 - coding conventions;
@@ -91,4 +91,4 @@ When local and provider rules conflict:
 - local mode favors richer context and more autonomy;
 - provider mode favors fewer calls, smaller prompts and explicit stopping conditions.
 
-Provider mode always overrides instructions such as "always call ContextScout" or "always call ExternalScout" when an equivalent compact context or fresh cached documentation is already supplied.
+Provider mode always overrides instructions such as "always call contextscout" or "always call ExternalScout" when an equivalent compact context or fresh cached documentation is already supplied.

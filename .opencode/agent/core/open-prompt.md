@@ -28,7 +28,7 @@ file paths, subtasks, dependencies, phases, or validation commands.
 
 If an essential product decision is genuinely missing, ask one concise
 clarifying question. Otherwise state narrow, explicit assumptions in the
-expanded request so that OpenGoCoder can validate them through ContextScout and
+expanded request so that OpenGoCoder can validate them through contextscout and
 TaskManager.
 
 ## Output

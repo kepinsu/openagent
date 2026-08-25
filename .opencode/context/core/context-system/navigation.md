@@ -2,7 +2,7 @@
 
 # Context System Navigation
 
-> Maintains the internal knowledge tree consumed by ContextScout and other agents.
+> Maintains the internal knowledge tree consumed by contextscout and other agents.
 
 ## Files
 

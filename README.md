@@ -43,7 +43,7 @@ This produces a workflow that is easier to reason about, easier to extend and si
                          │
          ┌───────────────┼────────────────┐
          ▼               ▼                ▼
-   ContextScout    ExternalScout     TaskManager
+   contextscout    ExternalScout     TaskManager
                                            │
                                            ▼
                                    Execution Plan
@@ -53,7 +53,7 @@ This produces a workflow that is easier to reason about, easier to extend and si
                                            │
                     ┌──────────────────────┴──────────────────────┐
                     ▼                                             ▼
-              ContextScout (optional)                    Parallel execution
+              contextscout (optional)                    Parallel execution
                                                             │
                                                ┌────────────┴────────────┐
                                                ▼                         ▼
@@ -73,7 +73,7 @@ This produces a workflow that is easier to reason about, easier to extend and si
                                                           Batch completed
                                                                   │
                                                                   ▼
-                                                            DocWriter
+                                                            docwriter
                                                                   │
                                                                   ▼
                                                             Final Report
@@ -100,7 +100,7 @@ OpenGoCoder **never writes production code**.
 
 ---
 
-## ContextScout
+## contextscout
 
 Discovers project knowledge before implementation.
 
@@ -191,7 +191,7 @@ If validation fails, BatchExecutor sends the task back to the implementation age
 
 ---
 
-## DocWriter
+## docwriter
 
 Updates project documentation after successful implementation.
 

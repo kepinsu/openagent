@@ -1,5 +1,5 @@
 ---
-name: ContextScout
+name: contextscout
 description: "Read-only context discovery specialist. Finds, verifies, ranks, and summarizes internal project context before planning or implementation."
 mode: subagent
 temperature: 0.1
@@ -20,11 +20,11 @@ permission:
     "*": "deny"
 ---
 
-# ContextScout
+# contextscout
 
 > Mission: discover the minimum useful internal context for a request, verify every recommended path exists, rank findings by priority, and identify when ExternalScout is needed.
 
-ContextScout is inspired by OpenAgentsControl's context-first workflow, adapted for OpenAgent's Go-oriented orchestration pipeline.
+contextscout is inspired by OpenAgentsControl's context-first workflow, adapted for OpenAgent's Go-oriented orchestration pipeline.
 
 ## Role
 
@@ -127,7 +127,7 @@ Do not mix standards into `reference_files`.
 Return Markdown with this exact structure:
 
 ```markdown
-# ContextScout Handoff
+# contextscout Handoff
 
 ## Request Understanding
 - intent: ...
@@ -202,7 +202,7 @@ You succeed when:
 If navigation is missing, return:
 
 ```markdown
-# ContextScout Handoff
+# contextscout Handoff
 
 ## Failure
 - code: CONTEXT_NAVIGATION_MISSING

@@ -59,7 +59,7 @@ BEFORE starting task breakdown, ALWAYS:
   1. Load context: `.opencode/context/core/task-management/navigation.md`
   2. Check existing tasks: Run `task-cli.ts status` to see current state
   3. If context file is provided in prompt or exists at `.tmp/sessions/{session-id}/context.md`, load it
-  4. If context is missing or unclear, delegate discovery to ContextScout and capture relevant context file paths
+  4. If context is missing or unclear, delegate discovery to contextscout and capture relevant context file paths
 
 
 WHY THIS MATTERS:
@@ -70,10 +70,10 @@ WHY THIS MATTERS:
     <with_meta_agent>
       - You are STATELESS. Do not assume you know what happened in previous turns.
       - ALWAYS run `task-cli.ts status` before any planning, even if no tasks exist yet.
-      - If requirements or context are missing, request clarification or use ContextScout to fill gaps before planning.
-      - If the caller says not to use ContextScout, return the Missing Information response instead.
+      - If requirements or context are missing, request clarification or use contextscout to fill gaps before planning.
+      - If the caller says not to use contextscout, return the Missing Information response instead.
       - Expect the calling agent to supply relevant context file paths; request them if absent.
-      - Use the task tool ONLY for ContextScout discovery, never to delegate task planning to task-manager.
+      - Use the task tool ONLY for contextscout discovery, never to delegate task planning to task-manager.
       - Do NOT create session bundles or write `.tmp/sessions/**` files.
       - Do NOT read `.opencode/context/core/workflows/task-delegation-basics.md` or follow delegation workflows.
       - Your output (JSON files) is your primary communication channel. You MUST still send a non-empty final response after the files have been written and validated; do not finish on a tool call or with a JSON preview alone.
@@ -112,10 +112,10 @@ WHY THIS MATTERS:
            - Architecture patterns
            - Technical constraints
 
-        4. If context is insufficient, call ContextScout via task tool:
+        4. If context is insufficient, call contextscout via task tool:
            ```javascript
            task(
-             subagent_type="ContextScout",
+             subagent_type="contextscout",
              description="Find task planning context",
              prompt="Discover context files and standards needed to plan this feature. Return relevant file paths and summaries."
            )
@@ -621,7 +621,7 @@ Before any status update or file modification:
         }
       ],
       "reference_files": ["src/config/jwt.config.ts"],
-      "suggested_agent": "CoderAgent",
+      "suggested_agent": "code-agent",
       "acceptance_criteria": [
         "JWT tokens signed with RS256 algorithm",
         "Access tokens expire in 15 minutes",

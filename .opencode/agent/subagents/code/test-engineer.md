@@ -6,13 +6,14 @@ temperature: 0.1
 
 permission:
   bash:
-    "go test*": "allow"
     "*": "deny"
+    "go *": "allow"
   edit:
     "**/*_test.go": "allow"
   task:
     "*": "deny"
     contextscout: "allow"
+    BuildAgent: "allow"
   skill:
     "golang-how-to": "allow"
     "golang-testing": "allow"

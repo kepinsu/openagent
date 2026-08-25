@@ -8,8 +8,21 @@ permission:
   bash:
     "*": "deny"
     "npx ts-node*task-cli*": "allow"
-    "bash .opencode/skills/task-management/router.sh*": "allow"
+    "bash .opencode/skills/task-management/router.sh *": "allow"
     "go build *": "allow"
+    # Use only when you retry the principal agent
+    "ls *": "allow"
+    "cd *": "allow"
+    "cat *": "allow"
+    "head *": "allow"
+    "find *" : "allow"
+    "rg * ": "allow"
+    "tail *": "allow"
+    "git status": "allow"
+    "git diff": "allow"
+    "git log":"allow"
+    "git show":"allow"
+    "git grep": "allow"
   edit:
     "**": "deny"
 
@@ -39,7 +52,7 @@ You NEVER implement production code yourself.
 Read `.opencode/context/mode/execution-modes.md` when the prompt contains `execution_mode`.
 
 - `local`: maximum retries per task is 3 and independent tasks may run with up to 4 parallel implementation agents.
-- `provider`: maximum retries per task is 1 and at most 2 implementation agents may run in parallel. Do not invoke ContextScout if a compact project brief is already supplied and sufficient. Do not invoke ExternalScout unless TaskManager explicitly requested it or validation shows a version-specific documentation gap.
+- `provider`: maximum retries per task is 1 and at most 2 implementation agents may run in parallel. Do not invoke contextscout if a compact project brief is already supplied and sufficient. Do not invoke ExternalScout unless TaskManager explicitly requested it or validation shows a version-specific documentation gap.
 
 Provider mode prioritizes bounded calls over autonomy. If a task cannot proceed with the supplied compact context, report the missing context instead of launching broad rediscovery.
 
@@ -195,7 +208,7 @@ planning or prioritization question.
 
 simple-task is valid only for a new, standalone one-task request. If its input contains feature, task_root, task_json_path, subtask_path, subtask_paths, subtask_id, a phase or batch label, or a dependency graph, return exactly blocked: invalid_simple_task_route and do not delegate work. Those fields identify TaskManager-managed work and MUST use the standard route and the Artifact Gate.
 
-When `execution_route: simple-task` is supplied, treat `single_subtask` as the complete one-task execution plan. Do not invoke TaskManager, ContextScout, or ExternalScout unless the contract lacks one concrete required item. Delegate exactly one CoderAgent and validate that one task through the normal validation step.
+When `execution_route: simple-task` is supplied, treat `single_subtask` as the complete one-task execution plan. Do not invoke TaskManager, contextscout, or ExternalScout unless the contract lacks one concrete required item. Delegate exactly one CoderAgent and validate that one task through the normal validation step.
 
 ## validation-fix
 
@@ -217,7 +230,7 @@ If implementation context is incomplete or ambiguous:
 2. Retrieve the missing project context.
 3. Continue executing the existing execution plan.
 
-*ContextScout* may only clarify project context.
+*contextscout* may only clarify project context.
 
 It must never modify the execution plan.
 
@@ -227,7 +240,7 @@ It must never modify the execution plan.
 
 batch-executor MUST build a task-specific context slice before invoking any implementation agent.
 
-The context slice is the only implementation context that should be passed to `coder-agent`. Do not forward the full execution plan, full ContextScout output, full ExternalScout output, full transcript, or unrelated task details.
+The context slice is the only implementation context that should be passed to `coder-agent`. Do not forward the full execution plan, full contextscout output, full ExternalScout output, full transcript, or unrelated task details.
 
 TaskManager owns the stable subtask contract. Build the context slice directly from the selected `subtask_NN.json` using this mapping:
 
@@ -268,7 +281,7 @@ The context slice MUST NOT contain:
 - previous agent chatter unrelated to the current task;
 - implementation details invented by batch-executor.
 
-In `provider` mode, context slicing is mandatory and strict. If the slice is missing required information, ask ContextScout only for the missing item or report the missing context. Do not perform broad rediscovery.
+In `provider` mode, context slicing is mandatory and strict. If the slice is missing required information, ask contextscout only for the missing item or report the missing context. Do not perform broad rediscovery.
 
 In `local` mode, context slices may be richer, but they should still avoid unrelated task details.
 
@@ -333,7 +346,7 @@ If validation fails:
 - extract only the failure details relevant to the current task;
 - invoke *coder-agent* again with `execution_route: validation-fix` and a fresh context slice;
 - include only the original subtask contract, latest validation failure, affected files, requested corrections, and narrow validation command.
-- do not restart TaskManager, ContextScout, ExternalScout, or the full CoderAgent workflow.
+- do not restart TaskManager, contextscout, ExternalScout, or the full CoderAgent workflow.
 
 Repeat until validation succeeds or retry limit is reached.
 

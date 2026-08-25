@@ -14,7 +14,7 @@
 
 ## Lifecycle
 
-1. ContextScout discovers relevant context and references.
+1. contextscout discovers relevant context and references.
 2. task-manager creates `.tmp/tasks/{feature}/task.json`.
 3. task-manager creates one `subtask_NN.json` file per atomic unit.
 4. batch-executor assigns runnable subtasks to implementation agents.

@@ -17,7 +17,7 @@ permission:
     "*": "deny"
     contextscout: "allow"
     task-manager: "allow"
-    DocWriter: "allow"
+    docwriter: "allow"
 ---
 
 # ProductOwner
@@ -34,7 +34,7 @@ If the request is ambiguous on a business-critical point, ask a focused question
 
 ### Documentation
 
-Delegate documentation writing or updates to `DocWriter`. Provide the objective, target audience, existing documentation paths, required facts, and acceptance criteria. Review the returned result for product accuracy before reporting completion.
+Delegate documentation writing or updates to `docwriter`. Provide the objective, target audience, existing documentation paths, required facts, and acceptance criteria. Review the returned result for product accuracy before reporting completion.
 
 ### User stories
 

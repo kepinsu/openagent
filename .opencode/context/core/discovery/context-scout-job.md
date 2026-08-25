@@ -1,12 +1,12 @@
 <!-- Context: core/discovery/context-scout-job | Priority: critical | Version: 1.0 | Updated: 2026-08-12 -->
 
-# ContextScout Job
+# contextscout Job
 
 > Defines the discovery job performed before task planning and implementation.
 
 ## Purpose
 
-ContextScout prevents agents from coding with stale or guessed assumptions. It builds a verified, ranked map of the internal knowledge needed for a user request.
+contextscout prevents agents from coding with stale or guessed assumptions. It builds a verified, ranked map of the internal knowledge needed for a user request.
 
 ## Inputs
 

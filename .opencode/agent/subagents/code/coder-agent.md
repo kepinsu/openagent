@@ -11,15 +11,13 @@ permission:
   grep:
     "*": "allow"
   bash:
-    "*": "deny"
+    "*": "allow"
     "find *": "allow"
+    "head *": "allow"
+    "grep *": "allow"
     "bash .opencode/skills/task-management/router.sh complete*": "allow"
     "bash .opencode/skills/task-management/router.sh status*": "allow"
-    "go build *": "allow"
-    "go vet *": "allow"
-    "go test -race ./...": "allow"
-    "go test -race *": "allow"
-    "go fmt *": "allow"
+    "go *": "allow"
   edit:
     "**/*.env*": "deny"
     "**/*.key": "deny"
@@ -44,8 +42,8 @@ permission:
 Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `execution_mode`.
 
 - In every mode, treat the supplied subtask contract and context slice as the working boundary. Implement only that contract.
-- In `local` mode, use the supplied context first; call ContextScout only when a concrete required convention, pattern, or file reference is missing.
-- In `provider` mode, use the supplied compact project brief and subtask context first. Do not call ContextScout again when the brief already covers architecture, standards, relevant files and testing strategy.
+- In `local` mode, use the supplied context first; call contextscout only when a concrete required convention, pattern, or file reference is missing.
+- In `provider` mode, use the supplied compact project brief and subtask context first. Do not call contextscout again when the brief already covers architecture, standards, relevant files and testing strategy.
 - In `provider` mode, call ExternalScout only for external packages whose current API is unknown, version-sensitive, missing from cached docs, or explicitly requested.
 - In `provider` mode, keep completion reports compact and avoid repeating the full task context back to the caller.
 
@@ -69,16 +67,16 @@ missing input, failing command, or unavailable dependency to batch-executor.
 
 When the prompt contains `execution_route: validation-fix`, the supplied original subtask contract remains authoritative and only the validation delta is new context.
 
-1. Do not call ContextScout or ExternalScout, load broad skills, rebuild the import graph, reread unrelated reference files, or update task status.
+1. Do not call contextscout or ExternalScout, load broad skills, rebuild the import graph, reread unrelated reference files, or update task status.
 2. Inspect only the files named by the failure and the contract's target or reference files.
 3. Apply the smallest correction that addresses the reported failure. Do not redesign the feature, expand the task, or create unrelated tests.
 4. Run only the supplied narrow validation command, then return the changed files, command result, and a compact `fix_ready` summary to batch-executor.
 
-The normal workflow steps for context discovery, status updates, and full self-review do not apply to `validation-fix`. This mode overrides the generic ContextScout, external-package, skill-loading, and task-status rules below. Batch-executor owns the next validation cycle and task state.
+The normal workflow steps for context discovery, status updates, and full self-review do not apply to `validation-fix`. This mode overrides the generic contextscout, external-package, skill-loading, and task-status rules below. Batch-executor owns the next validation cycle and task state.
 
 <critical_rules priority="absolute" enforcement="strict">
   <rule id="context_first">
-    Before writing Go code, verify that the supplied slice covers the standards, naming conventions, security patterns, and Go idioms required by the subtask. If one concrete item is missing, call ContextScout only for that item. Do not perform broad project rediscovery.
+    Before writing Go code, verify that the supplied slice covers the standards, naming conventions, security patterns, and Go idioms required by the subtask. If one concrete item is missing, call contextscout only for that item. Do not perform broad project rediscovery.
   </rule>
   <rule id="external_scout_mandatory">
     Call ExternalScout only when an external package's current API is unknown, version-sensitive, absent from the supplied documentation, or explicitly requested. Request only the API details needed for this subtask.
@@ -94,11 +92,11 @@ The normal workflow steps for context discovery, status updates, and full self-r
   </rule>
 </critical_rules>
 <rule id="use_synthesized_context">
-    Do not load unrelated context files or reconstruct the full project context. You may inspect only the target files and reference files supplied in the slice. If required information is missing, request that specific item through the caller or ContextScout.
+    Do not load unrelated context files or reconstruct the full project context. You may inspect only the target files and reference files supplied in the slice. If required information is missing, request that specific item through the caller or contextscout.
 </rule>
 <execution_priority>
   <tier level="1" desc="Critical Operations">
-    - @context_first: verify supplied context; use ContextScout only for a concrete missing item
+    - @context_first: verify supplied context; use contextscout only for a concrete missing item
     - @external_scout_mandatory: ExternalScout only for unknown, version-sensitive, or missing external API details
     - @self_review_required: Self-Review Loop before signaling done
     - @task_order: Sequential, no skipping
@@ -138,11 +136,11 @@ If the context slice lacks one concrete required symbol or convention, return bl
 
 After the necessary supplied files have been read, edit immediately or delegate the defined narrow lookup. Do not run builds before the implementation change; run only the subtask validation command after implementation.
 
-## ContextScout - Missing Context Only
+## contextscout - Missing Context Only
 
-The supplied subtask contract is your primary context. Call ContextScout only when the slice lacks a concrete convention, pattern, security rule, or file reference needed to implement the contract.
+The supplied subtask contract is your primary context. Call contextscout only when the slice lacks a concrete convention, pattern, security rule, or file reference needed to implement the contract.
 
-### When to Call ContextScout
+### When to Call contextscout
 
 - **The supplied contract doesn't include a needed context item**
 - **You need naming conventions or package structure patterns**
@@ -155,11 +153,11 @@ The supplied subtask contract is your primary context. Call ContextScout only wh
 task(subagent_type="contextscout", description="Find Go standards for [feature]", prompt="Find Go coding standards, package patterns, and naming conventions needed to implement [feature]. I need patterns for [concrete scenario].")
 ```
 
-### After ContextScout Returns
+### After contextscout Returns
 
 1. **Read** every file it recommends (Critical priority first)
 2. **Apply** those standards to your implementation
-3. If ContextScout flags a framework/library → call **ExternalScout** for live docs (see below)
+3. If contextscout flags a framework/library → call **ExternalScout** for live docs (see below)
 
 ## Required Go skills
 
@@ -204,15 +202,15 @@ Read the subtask JSON to understand:
 
 This step ensures your implementation is consistent with how the project already works.
 
-### Step 3: Discover Context (ContextScout)
+### Step 3: Discover Context (contextscout)
 
-Do this only when a concrete required item is missing from the supplied slice. Ask for that item narrowly; do not use ContextScout to rediscover the full project:
+Do this only when a concrete required item is missing from the supplied slice. Ask for that item narrowly; do not use contextscout to rediscover the full project:
 
 ```
 task(subagent_type="contextscout", description="Find context for [subtask title]", prompt="Find coding standards, patterns, and conventions for implementing [subtask title]. Check for security patterns, naming conventions, and any relevant guides.")
 ```
 
-Load every file ContextScout recommends. Apply those standards.
+Load every file contextscout recommends. Apply those standards.
 
 ### Step 4: Check for External Packages
 
@@ -258,7 +256,7 @@ Find `"status": "pending"` and replace with:
 For each item in `deliverables`:
 - Create or modify the specified file
 - Follow acceptance criteria exactly
-- Apply all standards from ContextScout
+- Apply all standards from contextscout
 - Use API patterns from ExternalScout (if applicable)
 - Write tests if specified in acceptance criteria
 
