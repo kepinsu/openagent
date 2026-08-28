@@ -7,7 +7,7 @@
     "context_strategy": "compact",
     "share_raw_findings": false,
     "max_files_per_agent": 8,
-    "max_context_tokens_per_agent": 12000,
+    "max_context_tokens_per_agent": 120000,
     "max_parallel_agents": 2,
     "max_retries_per_task": 1,
     "external_scout": "on_demand",

@@ -44,12 +44,9 @@ Production code fixes are handled by BatchExecutor.
 
 # Context
 
-If testing conventions are unclear:
+TestEngineer is invoked once, in the BatchExecutor final quality gate. Treat the supplied final validation slice as the complete working boundary.
 
-1. Invoke `contextscout` to load the context of this development.
-2. Loads all skills what you think is useful
-3. Load testing conventions.
-4. Continue.
+If testing conventions are not included and one concrete required convention is missing, invoke contextscout only for that item. Do not rediscover the project, load all skills, or read unrelated files. Load at most two skills, and only when directly relevant to the supplied validation command.
 
 ---
 
@@ -61,7 +58,7 @@ For every implementation:
 
 2. Write or update tests when required.
 
-3. Execute the relevant tests.
+3. Execute the supplied narrow feature validation command. Do not replace it with go test ./... unless that exact command was supplied.
 
 Example:
 
@@ -100,7 +97,7 @@ Return:
 
 - failure reason
 - failing tests
-- logs
+- the relevant error excerpt only (at most 60 lines)
 
 Do not retry. Do not modify production code. The orchestrator decides whether another implementation cycle is required.
 
@@ -115,3 +112,5 @@ Return:
 - pass/fail status
 - coverage (if available)
 - failure details
+
+Keep the final report under 1,200 tokens. Do not return raw test logs or repeat the full validation slice.

@@ -42,7 +42,7 @@ permission:
 Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `execution_mode`.
 
 - In every mode, treat the supplied subtask contract and context slice as the working boundary. Implement only that contract.
-- In `local` mode, use the supplied context first; call contextscout only when a concrete required convention, pattern, or file reference is missing.
+- In local mode, use the same bounded context-slice contract as provider mode; call contextscout only when a concrete required convention, pattern, or file reference is missing.
 - In `provider` mode, use the supplied compact project brief and subtask context first. Do not call contextscout again when the brief already covers architecture, standards, relevant files and testing strategy.
 - In `provider` mode, call ExternalScout only for external packages whose current API is unknown, version-sensitive, missing from cached docs, or explicitly requested.
 - In `provider` mode, keep completion reports compact and avoid repeating the full task context back to the caller.
@@ -155,17 +155,21 @@ task(subagent_type="contextscout", description="Find Go standards for [feature]"
 
 ### After contextscout Returns
 
-1. **Read** every file it recommends (Critical priority first)
+1. **Read** only the one or two files that answer the missing item (Critical priority first)
 2. **Apply** those standards to your implementation
-3. If contextscout flags a framework/library → call **ExternalScout** for live docs (see below)
+3. If an API detail is still missing, call ExternalScout for that detail only.
 
-## Required Go skills
+## Selective Go Skills
 
-The all local Go skills are global and usefuls for all Go-related tasks. They
-are resolved from `.opencode/skills/go/<skill>/SKILL.md`. Do not skip them to
-save context: always start with `golang-how-to`, then load every skill relevant
-to the requested task, the imported libraries, and any risks you identify. For
-cross-cutting work, combine multiple skills rather than relying on a single one.
+The supplied context slice is the source of truth. Do not load skills by default, and never load every Go skill. Select at most two skills only when the subtask explicitly needs their subject:
+
+- tests or test changes: golang-testing;
+- authentication, inputs, secrets, or permissions: golang-security;
+- goroutines, channels, locks, or cancellation: golang-concurrency;
+- profiling or a measured regression: golang-performance or golang-benchmark;
+- a named Go tool or library: its directly relevant skill.
+
+Read only the relevant section of a selected skill. Do not open evals, assets, or unrelated references. If no listed condition applies, work from the task contract, supplied conventions, target files, and reference files only.
 
 And :
 
@@ -210,7 +214,7 @@ Do this only when a concrete required item is missing from the supplied slice. A
 task(subagent_type="contextscout", description="Find context for [subtask title]", prompt="Find coding standards, patterns, and conventions for implementing [subtask title]. Check for security patterns, naming conventions, and any relevant guides.")
 ```
 
-Load every file contextscout recommends. Apply those standards.
+Load only the files that answer the concrete missing item. Do not use a contextscout result as permission to widen the task boundary.
 
 ### Step 4: Check for External Packages
 
@@ -318,11 +322,11 @@ bash .opencode/skills/task-management/router.sh status {feature}
 Confirm your subtask now shows: `status: "completed"`
 
 **8.3 Signal Completion to Orchestrator**:
-Report back with:
-- Self-Review Report (from Step 7)
-- Completion summary (max 200 chars)
-- List of deliverables created
-- Confirmation that subtask status is marked complete
+Report back with a compact handoff (maximum 800 tokens):
+- completion summary (max 200 chars);
+- changed files;
+- validation command and pass/fail result;
+- one concrete risk or blocker, if any.
 
 Example completion report:
 ```

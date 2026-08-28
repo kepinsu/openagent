@@ -168,36 +168,7 @@ WHY THIS MATTERS:
            - Constraints/risks
            ```
 
-         4. Create subtask plan with JSON preview:
-             ```
-             ## Task Plan
-
-             feature: {kebab-case-feature-name}
-             objective: {one-line description, max 200 chars}
-
-             context_files (standards to follow):
-             - {standards paths from session context.md}
-
-             reference_files (source material to look at):
-             - {project source files from session context.md}
-
-             subtasks:
-             - seq: 01, title: {title}, depends_on: [], parallel: {true/false}
-             - seq: 02, title: {title}, depends_on: ["01"], parallel: {true/false}
-
-             exit_criteria:
-             - {specific completion criteria}
-             
-             enhanced_fields (if available from planning agents):
-             - bounded_context: {from ArchitectureAnalyzer}
-             - module: {from ArchitectureAnalyzer}
-             - vertical_slice: {from StoryMapper}
-             - contracts: {from ContractManager}
-             - related_adrs: {from ADRManager}
-             - rice_score: {from PrioritizationEngine}
-             - wsjf_score: {from PrioritizationEngine}
-             - release_slice: {from PrioritizationEngine}
-             ```
+         4. Create the subtask plan internally. Persist the authoritative JSON artifacts in Stage 2; do not preview their JSON content in a response.
 
         5. Proceed directly to JSON creation in this run when info is sufficient.
       </process>
@@ -665,6 +636,22 @@ Use task-cli.ts for all status operations:
 Script location: `.opencode/skills/task-management/scripts/task-cli.ts`
 </cli_integration>
 
+<output_contract priority="absolute">
+  TaskManager JSON belongs only in files under .tmp/tasks/. Never reproduce task.json, any subtask JSON, contexts.json, a JSON object, a JSON array, or a JSON code fence in an agent response.
+
+  Do not send a planning preview before writing artifacts. After validation, return only this compact TaskManager Handoff, with a maximum of 700 tokens:
+  - feature
+  - task_root
+  - task_json_path
+  - subtask_paths (paths only; never their contents)
+  - subtask_count
+  - dependency-ready task IDs from the scheduler
+  - validation status
+  - plan summary of at most five bullets
+
+  On failure, return only the existing blocked artifact response. Tool logs, generated JSON, acceptance criteria arrays, context arrays, and full dependency graphs stay in the artifact files and are not echoed.
+</output_contract>
+
 <quality_standards>
   <atomic_tasks>Each task completable in 1-2 hours</atomic_tasks>
   <clear_objectives>Single, measurable outcome per task</clear_objectives>
@@ -680,7 +667,7 @@ Script location: `.opencode/skills/task-management/scripts/task-cli.ts`
   <pre_flight>Context loaded, status checked, feature request clear</pre_flight>
   <stage_checkpoints>
     <stage_0>Context loaded, current state understood</stage_0>
-    <stage_1>Plan presented with JSON preview, ready for creation</stage_1>
+    <stage_1>Plan prepared internally and persisted as validated artifacts</stage_1>
     <stage_2>All JSON files created and validated</stage_2>
     <stage_3>Task verified, status updated via CLI</stage_3>
     <stage_4>Feature archived to completed/</stage_4>

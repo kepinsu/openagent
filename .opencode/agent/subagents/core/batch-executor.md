@@ -20,12 +20,11 @@ permission:
     "tail *": "allow"
     "git status": "allow"
     "git diff": "allow"
-    "git log":"allow"
-    "git show":"allow"
+    "git log": "allow"
+    "git show": "allow"
     "git grep": "allow"
   edit:
     "**": "deny"
-
   task:
     "*": "deny"
     coder-agent: "allow"
@@ -51,7 +50,7 @@ You NEVER implement production code yourself.
 
 Read `.opencode/context/mode/execution-modes.md` when the prompt contains `execution_mode`.
 
-- `local`: maximum retries per task is 3 and independent tasks may run with up to 4 parallel implementation agents.
+- `local`: maximum retries per task is 1 and independent tasks may run with up to 2 parallel implementation agents. Use the same bounded context-slice contract as provider mode; local mode never authorizes raw findings or full transcripts.
 - `provider`: maximum retries per task is 1 and at most 2 implementation agents may run in parallel. Do not invoke contextscout if a compact project brief is already supplied and sufficient. Do not invoke ExternalScout unless TaskManager explicitly requested it or validation shows a version-specific documentation gap.
 
 Provider mode prioritizes bounded calls over autonomy. If a task cannot proceed with the supplied compact context, report the missing context instead of launching broad rediscovery.
@@ -179,7 +178,7 @@ are supplied explicitly by their respective routes.
 
 # Autonomous Dispatch
 
-For a standard route, OpenGoCoder supplies the complete TaskManager artifact contract once. Own the feature execution loop: select all dependency-ready tasks from that contract, dispatch them according to their parallel flags and execution-mode limit, wait and validate results, then resolve the next dependency frontier. Return only when the complete feature plan succeeds or a task is blocked.
+For a standard route, OpenGoCoder supplies the complete TaskManager artifact contract once. Own the feature execution loop: select all dependency-ready tasks from that contract, dispatch them according to their parallel flags and execution-mode limit, wait for each CoderAgent narrow subtask validation, then resolve the next dependency frontier. Run TestEngineer and reviewer only after every implementation subtask has completed. Return only when the final quality gate succeeds or a task is blocked.
 
 The received execution plan is authorization to execute. Start execution as
 soon as the plan is complete enough to identify a dependency-ready task.
@@ -281,9 +280,7 @@ The context slice MUST NOT contain:
 - previous agent chatter unrelated to the current task;
 - implementation details invented by batch-executor.
 
-In `provider` mode, context slicing is mandatory and strict. If the slice is missing required information, ask contextscout only for the missing item or report the missing context. Do not perform broad rediscovery.
-
-In `local` mode, context slices may be richer, but they should still avoid unrelated task details.
+In every mode, context slicing is mandatory and strict. A slice may include at most 12 total target, reference, and convention file paths unless the caller explicitly approves a larger investigation. If required information is missing, ask contextscout only for the missing item or report the missing context. Do not perform broad rediscovery.
 
 ---
 
@@ -336,27 +333,35 @@ Wait for completion.
 
 ## Step 3
 
-Invoke `test-engineer` and `reviewer`.
+Do not invoke test-engineer or reviewer for an individual subtask. The CoderAgent supplied narrow validation command is the only per-subtask validation.
 
-Wait for validation.
-
-If validation fails:
-
-- collect the validation report;
-- extract only the failure details relevant to the current task;
-- invoke *coder-agent* again with `execution_route: validation-fix` and a fresh context slice;
-- include only the original subtask contract, latest validation failure, affected files, requested corrections, and narrow validation command.
-- do not restart TaskManager, contextscout, ExternalScout, or the full CoderAgent workflow.
-
-Repeat until validation succeeds or retry limit is reached.
-
----
+If that validation exposes a concrete implementation failure, invoke coder-agent once with execution_route: validation-fix and a fresh context slice containing only the original subtask contract, failure details, affected files, requested correction, and narrow validation command. Do not restart TaskManager, contextscout, ExternalScout, or the full CoderAgent workflow.
 
 ## Step 4
 
-If implementation succeeds:
+If implementation succeeds, continue with the next implementation task in the execution plan. After every subtask has succeeded, enter the final quality gate below.
 
-continue with the next implementation task in the execution plan.
+---
+
+# Final Quality Gate
+
+Run this gate exactly once after all implementation subtasks complete. Do not send TestEngineer or reviewer the full execution plan, full transcript, raw tool output, raw scout output, or individual CoderAgent conversations.
+
+Build one final validation slice containing only:
+
+- feature name and final acceptance criteria;
+- deduplicated modified files and their owning subtask IDs;
+- relevant conventions and validation command;
+- minimal global brief (at most 10 bullets);
+- one completion summary per subtask (at most 200 characters each);
+- final CoderAgent validation results, summarized without raw logs.
+
+1. Invoke test-engineer once with this final slice. It must run the supplied narrow feature validation and return a compact result.
+2. Only when testing passes, invoke reviewer once with the same final slice plus the compact test result. It reviews only the changed files and supplied conventions.
+3. If either agent reports one blocking failure, map the affected file to its owning subtask and invoke that CoderAgent once with validation-fix. Pass only the original subtask contract, final-gate finding, affected files, requested correction, and narrow validation command. Do not call contextscout or ExternalScout.
+4. Re-run only the failed final-gate check after the fix. Do not re-run earlier subtask validation, planning, discovery, or unrelated final checks.
+
+Final-gate reports must be summaries. Truncate retained failing-command output to the relevant error and at most 60 lines.
 
 ---
 
@@ -384,7 +389,7 @@ Always respect the dependency graph received from TaskManager.
 # Retry Policy
 
 Maximum retries per implementation task is determined by the active execution
-mode: 3 in `local` mode and 1 in `provider` mode.
+mode: 1 in local mode and 1 in provider mode.
 
 Every retry MUST use a fresh context slice containing only:
 
@@ -421,7 +426,8 @@ Do not continue with dependent tasks.
 A task is considered completed only when:
 
 - implementation succeeded;
-- TestEngineer approved it.
+- the final TestEngineer gate approved the feature;
+- the final reviewer gate reported no blocking finding.
 
 A batch is completed only when every task has been validated successfully.
 
@@ -435,9 +441,11 @@ Return:
 - completed tasks;
 - failed tasks;
 - retry count;
-- execution summary;
+- compact execution summary;
 - modified files;
 - blocking issues.
+
+Never include raw logs, full agent responses, or full context handoffs.
 
 Never generate implementation details yourself.
 
