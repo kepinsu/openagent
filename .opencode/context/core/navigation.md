@@ -37,3 +37,4 @@
 - `task-manager` consumes contextscout handoff as `context_files` and `reference_files`.
 - `batch-executor` passes bounded context to implementation agents.
 - `context-manager` maintains this tree when the context system changes.
+- `system-builder` delegates approved context bootstrap and extension to `context-organizer`.

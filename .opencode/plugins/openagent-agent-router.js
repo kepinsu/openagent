@@ -1,3 +1,4 @@
+const DEVELOPMENT_ENTRY_AGENT = "OpenGoCoder";
 const FRONTEND_AGENT = "open-frontend-specialist";
 const GO_AGENT = "coder-agent";
 
@@ -102,8 +103,19 @@ async function selectAgent(parts, directory) {
   return cachedProjectAgent(directory);
 }
 
+function isDevelopmentRequest(inputAgent, outputAgent) {
+  return (
+    inputAgent === DEVELOPMENT_ENTRY_AGENT ||
+    (!inputAgent && outputAgent === DEVELOPMENT_ENTRY_AGENT)
+  );
+}
+
 export const OpenAgentAgentRouter = async ({ directory }) => ({
-  "chat.message": async (_input, output) => {
+  "chat.message": async (input, output) => {
+    if (!isDevelopmentRequest(input.agent, output.message.agent)) {
+      return;
+    }
+
     const agent = await selectAgent(output.parts, directory);
 
     if (agent && output.message.agent !== agent) {
