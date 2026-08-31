@@ -36,4 +36,4 @@
 - `OpenGoCoder` invokes `contextscout` before task planning.
 - `task-manager` consumes contextscout handoff as `context_files` and `reference_files`.
 - `batch-executor` passes bounded context to implementation agents.
-- `ContextManager` maintains this tree when the context system changes.
+- `context-manager` maintains this tree when the context system changes.

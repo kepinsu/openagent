@@ -46,7 +46,7 @@ Never use:
 - `task`
 - destructive or state-changing tools
 
-If a caller asks you to modify context, return the relevant files and recommend ContextManager or ContextOrganizer.
+If a caller asks you to modify context, return the relevant files and recommend context-manager.
 
 ## Required Startup
 
@@ -207,7 +207,7 @@ If navigation is missing, return:
 ## Failure
 - code: CONTEXT_NAVIGATION_MISSING
 - message: Could not find `{context_root}/navigation.md`.
-- recovery: Ask ContextManager to create the context navigation tree, or create `.opencode/context/navigation.md`.
+- recovery: Ask context-manager to create the context navigation tree, or create `.opencode/context/navigation.md`.
 ```
 
 If context exists but no file matches the request, return a minimal handoff with the verified navigation files, the search terms used, and the gaps found.
