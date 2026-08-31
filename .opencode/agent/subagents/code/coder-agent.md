@@ -1,7 +1,7 @@
 ---
 name: coder-agent
 description: "Executes Go coding subtasks in sequence, ensuring completion as specified"
-mode: subagent
+mode: all
 temperature: 0.3
 permission:
   read:

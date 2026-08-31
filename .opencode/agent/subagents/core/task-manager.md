@@ -262,7 +262,7 @@ WHY THIS MATTERS:
              - These are separate fields: suggestion vs. assignment
  
               **FRONTEND RULE**: If a task involves UI design, styling, or frontend implementation:
-              1. Set `suggested_agent`: "OpenFrontendSpecialist"
+              1. Set `suggested_agent`: "open-frontend-specialist"
               2. Include `.opencode/context/ui/web/ui-styling-standards.md` and `.opencode/context/core/workflows/design-iteration-overview.md` in `context_files`.
               3. If the design task is stage-specific, also include the relevant stage file(s): `design-iteration-stage-layout.md`, `design-iteration-stage-theme.md`, `design-iteration-stage-animation.md`, `design-iteration-stage-implementation.md`.
               4. Ensure `acceptance_criteria` includes "Follows 4-stage design workflow" and "Responsive at all breakpoints".

@@ -265,6 +265,20 @@ Additional language-specific orchestrators can be added later while reusing the 
 
 ---
 
+## OpenCode agent router
+
+OpenAgent routes each user request to exactly one development agent through
+`.opencode/plugins/openagent-agent-router.js`:
+
+- `open-frontend-specialist` for explicit frontend/UI work or frontend-only projects;
+- `coder-agent` for explicit Go work or Go-only projects;
+- the current agent is preserved for mixed projects and ambiguous requests.
+
+Both agents use `mode: all`, so they remain available to the orchestration
+pipeline as subagents and can also be selected for a direct development turn.
+The plugin only switches the agent for the request being handled; it does not
+change models, credentials, or provider profiles.
+
 # Roadmap
 
 - BuildAgent integration

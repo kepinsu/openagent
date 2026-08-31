@@ -22,6 +22,7 @@ permission:
     "curl*": "allow"
     "jq*": "allow"
     "head*": "allow"
+    "python3 *": "allow"
   edit:
     "*": "deny"
   write:

@@ -113,8 +113,19 @@ Exclusive implementation gateway. batch-executor is the only agent allowed to co
 
 ## docwriter
 
-After a successful implementation, invoke *docwriter* if documentation needs to
-be updated.
+After every successful implementation, invoke *docwriter* to maintain
+`.opencode/context/project-intelligence/`. This is mandatory even when no
+user-facing documentation changes.
+
+Pass a `project_intelligence_handoff` containing:
+
+- original request and feature slug;
+- validated batch-executor completion report and validation results;
+- relevant ContextScout and ExternalScout summaries;
+- changed modules, decisions, trade-offs, unresolved risks, and deferred work.
+
+Wait for docwriter to finish. It must add a delivery-log entry and include all
+updated project-intelligence files in the final report.
 
 ---
 
@@ -129,6 +140,7 @@ For a simple task, OpenGoCoder MUST:
 1. Create one `single_subtask` contract containing only the task, acceptance criteria, target files, reference files, relevant conventions, minimal global brief, and validation command.
 2. Invoke batch-executor once with `execution_route: simple-task`, that contract, and the active execution mode.
 3. Wait for batch-executor to complete and report its result.
+4. If batch-executor reports success, invoke docwriter with the `project_intelligence_handoff` above and wait for its result before reporting completion.
 
 OpenGoCoder MUST NOT invoke task-manager, contextscout, ExternalScout, or coder-agent directly for this route unless batch-executor reports one concrete missing context item. batch-executor delegates the single contract to exactly one CoderAgent.
 
@@ -155,8 +167,10 @@ For every production-code modification:
 6. Wait for **batch-executor** to finish the complete feature plan or report one blocking failure. OpenGoCoder MUST NOT inspect project source, verify individual changes, select the next subtask, or invoke batch-executor again for ordinary plan progress.
 
 7. If **batch-executor** reports success:
-   - invoke **docwriter** when documentation must be updated;
-   - report completion.
+   - invoke **docwriter** with the `project_intelligence_handoff` above;
+   - wait for docwriter to finish;
+   - if docwriter fails, stop and report `project_intelligence_tracking_failed`;
+   - report completion with the project-intelligence update result.
 
 8. If **batch-executor** reports failure:
    - stop immediately;
@@ -176,7 +190,7 @@ OpenGoCoder:
 - never invokes coder-agent directly;
 - never bypasses batch-executor;
 - never reads project source files or constructs an implementation plan after contextscout has returned; it may read only TaskManager artifacts and task CLI state needed to route work;
-- never reports implementation success before batch-executor completes.
+- never reports workflow success before both batch-executor and docwriter complete.
 
 ---
 

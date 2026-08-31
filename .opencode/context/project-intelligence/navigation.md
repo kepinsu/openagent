@@ -13,6 +13,7 @@
 ├── technical-domain.md        # Stack, architecture, technical decisions
 ├── business-tech-bridge.md    # How business needs map to solutions
 ├── decisions-log.md           # Major decisions with rationale
+├── delivery-log.md            # Verified feature delivery history
 └── living-notes.md            # Active issues, debt, open questions
 ```
 
@@ -25,6 +26,7 @@
 | See the connection | `business-tech-bridge.md` | Business → technical mapping |
 | Know the context | `decisions-log.md` | Why decisions were made |
 | Current state | `living-notes.md` | Active issues and open questions |
+| Delivery history | `delivery-log.md` | Verified feature outcomes and validation |
 | All of the above | Read all files in order | Full project intelligence |
 
 ## Usage
@@ -38,6 +40,7 @@
 - Business focus → `business-domain.md`
 - Technical focus → `technical-domain.md`
 - Decision context → `decisions-log.md`
+- Feature history → `delivery-log.md`
 
 ## Integration
 
@@ -54,6 +57,8 @@ Keep this folder current:
 - Document decisions as they're made
 - Review `living-notes.md` regularly
 - Archive resolved items from decisions-log.md
+- After every validated feature, DocWriter appends the verified outcome and validation to `delivery-log.md`, then updates related records when relevant.
+- ContextScout treats these entries as the current project record and does not recreate them from scratch.
 
 **Management Guide**: See `.opencode/context/core/standards/project-intelligence-management.md` for complete lifecycle management including:
 - How to update, add, and remove files
