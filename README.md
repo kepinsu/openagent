@@ -22,8 +22,8 @@ Its agents and execution rules are maintained locally in this repository.
 
 | Need | Select or run | Result |
 | --- | --- | --- |
-| Go development | OpenGoCoder | Development entry point; the development router may select a Go or frontend specialist. |
-| Frontend design | OpenGoCoder with a clear UI request | The router can select open-frontend-specialist. |
+| Go development | OpenGoCoder | Development entry point; the router gives task-manager an implementation-route hint. |
+| Frontend design | OpenGoCoder with a clear UI request | Full orchestration, then open-frontend-specialist for the relevant implementation subtask. |
 | Context bootstrap or extension | system-builder | Delegates verified context work to context-organizer. |
 | Merge or pull request review | MergeRequestReviewer | Read-only review workflow; it is never auto-selected. |
 | Product story, issue, or product documentation | ProductOwner | Product workflow; it is never auto-selected. |
@@ -34,15 +34,18 @@ Its agents and execution rules are maintained locally in this repository.
 The plugin at .opencode/plugins/openagent-agent-router.js runs only when
 OpenGoCoder is the selected agent.
 
-It selects one direct development agent for a clear request or a single-stack
+It derives an implementation-agent hint for a clear request or a single-stack
 project:
 
 - coder-agent for Go work or a Go-only project;
 - open-frontend-specialist for UI work or a frontend-only project.
 
-For a mixed project, it leaves OpenGoCoder selected. In a single-stack project, project detection can select the corresponding development agent even when the request is ambiguous. The plugin
-changes the agent handling that message; it does not delegate a subtask and it
-does not change models, credentials, or provider settings.
+For a mixed project, no hint is added. In a single-stack project, project
+detection can provide the corresponding hint even when the request is
+ambiguous. The plugin never changes the agent handling the message: OpenGoCoder
+always runs the context, planning, execution, quality, and documentation
+workflow. task-manager records the selected implementation agent in the
+relevant subtask; batch-executor delegates only that subtask to it.
 
 No automatic routing occurs when another primary agent is selected. In
 particular, MergeRequestReviewer and ProductOwner always remain the selected

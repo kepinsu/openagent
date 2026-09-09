@@ -257,10 +257,12 @@ WHY THIS MATTERS:
               Agents MUST support both formats. Mix-and-match is allowed in the same array.
  
               **AGENT FIELD SEMANTICS**:
-             - `suggested_agent`: Recommendation from task-manager during planning (e.g., "CoderAgent", "TestEngineer")
+             - `suggested_agent`: Recommendation from task-manager during planning. Use only `coder-agent` or `open-frontend-specialist` for implementation subtasks.
              - `agent_id`: Set by the working agent when task moves to `in_progress` (tracks who is actually working on it)
              - These are separate fields: suggestion vs. assignment
  
+              **ROUTING HINT**: When the OpenAgent plugin adds an `implementation_agent` route hint, use that exact supported agent for each compatible implementation subtask. The hint preserves OpenGoCoder orchestration; it never replaces task analysis, dependency planning, or the frontend rules below.
+
               **FRONTEND RULE**: If a task involves UI design, styling, or frontend implementation:
               1. Set `suggested_agent`: "open-frontend-specialist"
               2. Include `.opencode/context/ui/web/ui-styling-standards.md` and `.opencode/context/core/workflows/design-iteration-overview.md` in `context_files`.

@@ -118,8 +118,23 @@ export const OpenAgentAgentRouter = async ({ directory }) => ({
 
     const agent = await selectAgent(output.parts, directory);
 
-    if (agent && output.message.agent !== agent) {
-      output.message.agent = agent;
-    }
+if (agent) {
+  const textPart = output.parts.find(
+    (part) => part.type === "text" && !part.ignored,
+  );
+
+  if (!textPart) {
+    return;
+  }
+
+  const hint =
+    "[OpenAgent route hint: implementation_agent=" +
+    agent +
+    ". Keep OpenGoCoder as the primary orchestrator; " +
+    "task-manager must record this agent in each relevant subtask's " +
+    "suggested_agent field.]";
+
+  textPart.text = hint + "\n\n" + textPart.text;
+}
   },
 });

@@ -28,6 +28,7 @@ permission:
   task:
     "*": "deny"
     coder-agent: "allow"
+    open-frontend-specialist: "allow"
     test-engineer: "allow"
     reviewer: "allow"
     contextscout: "allow"
@@ -290,20 +291,20 @@ For every implementation task:
 
 ## Step 1
 
-Determine the implementation agent without asking the caller for a choice.
+Read `suggested_agent` from the selected TaskManager subtask contract without
+asking the caller for a choice.
 
-Normally this is:
+- Use `open-frontend-specialist` when the contract explicitly selects it.
+- Use `coder-agent` when the field is absent or explicitly selects it.
+- If it names any other agent, return `blocked: unsupported_implementation_agent`.
 
-- *coder-agent*
-
-If TaskManager explicitly specifies another implementation agent,
-delegate to that agent instead.
+Do not replace a TaskManager frontend selection with `coder-agent`.
 
 ---
 
 ## Step 2
 
-Invoke the implementation agent (`coder-agent`) using the Task tool.
+Invoke the selected implementation agent using the Task tool.
 
 Build a context slice and provide only:
 
@@ -316,9 +317,9 @@ Build a context slice and provide only:
 - validation command;
 - retry feedback when retrying.
 
-The prompt to `coder-agent` MUST say that this context slice is the complete working boundary for the task.
+The prompt to the selected implementation agent MUST say that this context slice is the complete working boundary for the task.
 
-The prompt MUST also state that `coder-agent` is to implement only this contract and may request more context only when a concrete required item is missing from the slice.
+The prompt MUST also state that the selected implementation agent is to implement only this contract and may request more context only when a concrete required item is missing from the slice.
 
 
 Before delegation, batch-executor MUST verify that the context slice contains
