@@ -23,23 +23,26 @@ I provide a command-line interface for managing task breakdowns created by the T
 
 ## How to Use Me
 
+All router invocations first use the project-local router when available; otherwise they use the globally installed router at `~/.opencode/skills/task-management/router.sh`. In both cases, task artifacts remain in the current project under `.tmp/tasks/`.
+
+
 ### Quick Start
 
 ```bash
 # Show all task statuses
-bash .opencode/skills/task-management/router.sh status
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status
 
 # Show next eligible tasks
-bash .opencode/skills/task-management/router.sh next
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
 
 # Show blocked tasks
-bash .opencode/skills/task-management/router.sh blocked
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" blocked
 
 # Mark a task complete
-bash .opencode/skills/task-management/router.sh complete <feature> <seq> "summary"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete <feature> <seq> "summary"
 
 # Validate all tasks
-bash .opencode/skills/task-management/router.sh validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
 ```
 
 ### Command Reference
@@ -62,7 +65,7 @@ bash .opencode/skills/task-management/router.sh validate
 ### Check Overall Progress
 
 ```bash
-$ bash .opencode/skills/task-management/router.sh status
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status
 
 [my-feature] My Feature Implementation
   Status: active | Progress: 45% (5/11)
@@ -72,7 +75,7 @@ $ bash .opencode/skills/task-management/router.sh status
 ### Find What's Next
 
 ```bash
-$ bash .opencode/skills/task-management/router.sh next
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
 
 === Ready Tasks (deps satisfied) ===
 
@@ -84,7 +87,7 @@ $ bash .opencode/skills/task-management/router.sh next
 ### Mark Complete
 
 ```bash
-$ bash .opencode/skills/task-management/router.sh complete my-feature 05 "Implemented authentication module"
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete my-feature 05 "Implemented authentication module"
 
 ✓ Marked my-feature/05 as completed
   Summary: Implemented authentication module
@@ -94,7 +97,7 @@ $ bash .opencode/skills/task-management/router.sh complete my-feature 05 "Implem
 ### Check Dependencies
 
 ```bash
-$ bash .opencode/skills/task-management/router.sh deps my-feature 07
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" deps my-feature 07
 
 === Dependency Tree: my-feature/07 ===
 
@@ -106,7 +109,7 @@ $ bash .opencode/skills/task-management/router.sh deps my-feature 07
 ### Validate Everything
 
 ```bash
-$ bash .opencode/skills/task-management/router.sh validate
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
 
 === Validation Results ===
 
@@ -248,7 +251,7 @@ The `validate` command performs comprehensive checks on task files:
 
 Run `validate` regularly to catch issues early:
 ```bash
-bash .opencode/skills/task-management/router.sh validate my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate my-feature
 ```
 
 ### 6. Context and Reference Files
@@ -284,7 +287,7 @@ Working agents (CoderAgent, TestEngineer, etc.) execute subtasks and report comp
 task(subagent_type="TaskManager", description="Implement feature X", ...)
 
 # 2. Check what's ready
-bash .opencode/skills/task-management/router.sh next
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
 
 # 3. Delegate first task to working agent
 task(subagent_type="CoderAgent", description="Implement subtask 01", ...)
@@ -294,36 +297,36 @@ task(subagent_type="CoderAgent", description="Implement subtask 01", ...)
 
 ```bash
 # Check overall status
-bash .opencode/skills/task-management/router.sh status my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status my-feature
 
 # See what's next
-bash .opencode/skills/task-management/router.sh next my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next my-feature
 
 # Check what's blocked
-bash .opencode/skills/task-management/router.sh blocked my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" blocked my-feature
 ```
 
 ### Completing Tasks
 
 ```bash
 # After working agent finishes
-bash .opencode/skills/task-management/router.sh complete my-feature 05 "Implemented auth module with JWT support"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete my-feature 05 "Implemented auth module with JWT support"
 
 # Check progress
-bash .opencode/skills/task-management/router.sh status my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status my-feature
 
 # Find next task
-bash .opencode/skills/task-management/router.sh next my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next my-feature
 ```
 
 ### Validating Everything
 
 ```bash
 # Validate all tasks
-bash .opencode/skills/task-management/router.sh validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
 
 # Validate specific feature
-bash .opencode/skills/task-management/router.sh validate my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate my-feature
 ```
 
 ---
@@ -343,19 +346,19 @@ complete my-feature 05 "Done"
 ### 2. Check Dependencies Before Starting
 ```bash
 # See what a task depends on
-bash .opencode/skills/task-management/router.sh deps my-feature 07
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" deps my-feature 07
 ```
 
 ### 3. Identify Parallelizable Work
 ```bash
 # Find tasks that can run in parallel
-bash .opencode/skills/task-management/router.sh parallel my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" parallel my-feature
 ```
 
 ### 4. Regular Validation
 ```bash
 # Validate regularly to catch issues early
-bash .opencode/skills/task-management/router.sh validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
 ```
 
 ---

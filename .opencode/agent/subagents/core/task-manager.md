@@ -6,7 +6,7 @@ temperature: 0.5
 permission:
   bash:
     "*": "deny"
-    "bash .opencode/skills/task-management/router.sh*": "allow"
+    "bash *router.sh*": "allow"
     "mkdir -p .tmp/tasks*": "allow"
     "mv .tmp/tasks*": "allow"
   edit:
@@ -104,7 +104,7 @@ WHY THIS MATTERS:
 
         2. Check current task state:
            ```bash
-           bash .opencode/skills/task-management/router.sh status
+           bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status
            ```
 
         3. If context bundle provided, load and extract:
@@ -272,7 +272,7 @@ WHY THIS MATTERS:
  
          4. Validate with CLI:
            ```bash
-           bash .opencode/skills/task-management/router.sh validate {feature}
+           bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate {feature}
            ```
 
         5. Report creation:
@@ -317,7 +317,7 @@ WHY THIS MATTERS:
 
         3. If all criteria pass:
            ```bash
-           bash .opencode/skills/task-management/router.sh complete {feature} {seq} "{summary}"
+           bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete {feature} {seq} "{summary}"
            ```
 
         4. If criteria fail:
@@ -327,7 +327,7 @@ WHY THIS MATTERS:
 
         5. Check for next task:
            ```bash
-           bash .opencode/skills/task-management/router.sh next {feature}
+           bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next {feature}
            ```
       </process>
       <checkpoint>Task verified and status updated</checkpoint>
@@ -339,7 +339,7 @@ WHY THIS MATTERS:
       <process>
         1. Verify all tasks complete:
            ```bash
-           bash .opencode/skills/task-management/router.sh status {feature}
+           bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status {feature}
            ```
 
         2. If completed_count == subtask_count:
@@ -635,7 +635,7 @@ Use task-cli.ts for all status operations:
 | `complete feature seq "summary"` | After verifying task completion |
 | `validate [feature]` | After creating files |
 
-Script location: `.opencode/skills/task-management/scripts/task-cli.ts`
+Script location: local `.opencode/skills/task-management/scripts/task-cli.ts` when present, otherwise global `~/.opencode/skills/task-management/scripts/task-cli.ts`.
 </cli_integration>
 
 <output_contract priority="absolute">

@@ -8,7 +8,7 @@ permission:
   bash:
     "*": "deny"
     "npx ts-node*task-cli*": "allow"
-    "bash .opencode/skills/task-management/router.sh *": "allow"
+    "bash *router.sh*": "allow"
     "go build *": "allow"
     # Use only when you retry the principal agent
     "ls *": "allow"
@@ -141,7 +141,7 @@ The task artifacts are the source of truth. Read task_json_path once, then use t
 # Mandatory Scheduler Query
 
 For every standard-route invocation, the first scheduling tool call MUST be exactly:
-  bash .opencode/skills/task-management/router.sh next --json {feature}
+  bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next --json {feature}
 
 Make this call before reading any subtask JSON, reference file, source file, or running any validation command. Use its machine-readable output to choose the ready frontier. If the command fails, returns invalid JSON, or names no ready task while work remains, return blocked: scheduler_query_failed and do not explore or implement. The Bash call and its output must be visible in the execution trace.
 

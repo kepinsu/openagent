@@ -15,8 +15,8 @@ permission:
     "find *": "allow"
     "head *": "allow"
     "grep *": "allow"
-    "bash .opencode/skills/task-management/router.sh complete*": "allow"
-    "bash .opencode/skills/task-management/router.sh status*": "allow"
+    "bash *router.sh*": "allow"
+
     "go *": "allow"
   edit:
     "**/*.env*": "deny"
@@ -177,7 +177,7 @@ And :
    analyze local references before refactoring.
 - Run `gofmt`, then execute the tests for the modified packages. For
    concurrency-related work, also run `go test -race` whenever practical.
-   
+
 ---
 # OpenCode Agent Configuration
 # Metadata (id, name, category, type, version, author, tags, dependencies) is stored in:
@@ -307,17 +307,17 @@ Update subtask status and report completion to orchestrator:
 **8.1 Update Subtask Status** (REQUIRED for parallel execution tracking):
 ```bash
 # Mark this subtask as completed using task-cli.ts
-bash .opencode/skills/task-management/router.sh complete {feature} {seq} "{completion_summary}"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete {feature} {seq} "{completion_summary}"
 ```
 
 Example:
 ```bash
-bash .opencode/skills/task-management/router.sh complete auth-system 01 "Implemented JWT authentication with refresh tokens"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete auth-system 01 "Implemented JWT authentication with refresh tokens"
 ```
 
 **8.2 Verify Status Update**:
 ```bash
-bash .opencode/skills/task-management/router.sh status {feature}
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status {feature}
 ```
 Confirm your subtask now shows: `status: "completed"`
 
