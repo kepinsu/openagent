@@ -86,7 +86,7 @@ WHY THIS MATTERS:
       - `reference_files` = Source material ONLY (existing project files to look at). These come from the `## Reference Files` section of the session context.md.
     - NEVER mix standards and source files in the same array.
     - Be precise: Only include files relevant to that specific subtask.
-    - They will execute based on your JSON definitions.
+    - They will execute based on your JSON definitions. Batch-executor MUST forward the exact selected `subtask_path` and its `id` as `subtask_id` to the implementation agent, which reads the JSON directly. The batch-executor must not replace it with a mapped, filtered, or paraphrased prompt.
   </with_working_agents>
 </interaction_protocol>
 </critical_context_requirement>

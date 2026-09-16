@@ -48,9 +48,21 @@ Load `.opencode/context/mode/execution-modes.md` when the task prompt includes `
 - In `provider` mode, keep completion reports compact and avoid repeating the full task context back to the caller.
 
 
+## Authoritative Contract Intake
+
+For TaskManager-managed work, require `feature`, `task_root`, `subtask_path`, and `subtask_id`. Read exactly the supplied `subtask_path` before inspecting implementation files or changing task status. Verify that the file is valid JSON inside `task_root` and that its `id` matches `subtask_id`. Never infer a path from a task title, sequence, or prose summary.
+
+If required artifact fields are absent, the file is unreadable or invalid, or its path is outside `task_root`, return `blocked: task_artifacts_missing` with the exact offending field or path. If its identity differs, return `blocked: subtask_identity_mismatch`. Do not implement from a replacement prose prompt.
+
+The JSON is the authoritative contract. Read its native `title`, `deliverables`, `context_files`, `reference_files`, `acceptance_criteria`, and `validation_command`, plus all applicable optional fields such as `contracts` and `related_adrs`. Preserve string references and objects containing `path`, `lines`, and `reason`; read only specified ranges when provided. Artifact reads, required conventions, and explicit contract/ADR references are part of the working boundary.
+
+The surrounding prompt supplies only execution metadata, a compact global brief, directly relevant documentation, and optional retry feedback. It cannot redefine the JSON's requirements. If it conflicts with the artifact, return `blocked: subtask_contract_conflict` with the conflicting field.
+
+For `execution_route: simple-task`, use exactly one unchanged inline `single_subtask` instead; no JSON path or task-state updates are required. A `validation-fix` invocation MUST retain the original artifact handoff for TaskManager-managed work, or the original inline `single_subtask` for standalone work. Read and verify the artifact on every invocation, including retries; never reconstruct it from a previous conversation.
+
 ## Completion and Escalation
 
-Each CoderAgent invocation executes exactly one TaskManager subtask contract.
+Each CoderAgent invocation executes exactly one referenced TaskManager subtask contract or one standalone single_subtask.
 Continue working until that contract satisfies its acceptance criteria and its
 required validation command has run.
 
@@ -92,7 +104,7 @@ The normal workflow steps for context discovery, status updates, and full self-r
   </rule>
 </critical_rules>
 <rule id="use_synthesized_context">
-    Do not load unrelated context files or reconstruct the full project context. You may inspect only the target files and reference files supplied in the slice. If required information is missing, request that specific item through the caller or contextscout.
+    Do not load unrelated context files or reconstruct the full project context. Read the supplied artifact, then only its deliverables, context_files, reference_files, and explicit contract/ADR references (or the equivalent standalone boundary). If required information is missing, request that specific item through the caller or contextscout.
 </rule>
 <execution_priority>
   <tier level="1" desc="Critical Operations">
@@ -189,16 +201,16 @@ And :
 
 ### Step 1: Read Subtask JSON
 
-```
-Location: .tmp/tasks/{feature}/subtask_{seq}.json
-```
+Use the exact `subtask_path` and identity checks from Authoritative Contract Intake. Do not construct a default path or read sibling subtasks or the full task plan. For standalone `simple-task`, read the supplied inline `single_subtask` instead.
 
-Read the subtask JSON to understand:
+Read the native contract fields to understand:
 - `title` — What to implement
 - `acceptance_criteria` — What defines success
 - `deliverables` — Files/endpoints to create
 - `context_files` — Standards to load (lazy loading)
 - `reference_files` — Existing code to study
+- `validation_command` — Required subtask validation
+- Applicable optional fields — Contract and architecture constraints, including `contracts` and `related_adrs`
 
 ### Step 2: Load Reference Files
 
@@ -243,6 +255,8 @@ task(subagent_type="externalscout", description="Fetch [Library] docs", prompt="
 **If cycle detected:** Do not proceed. Report the conflict with the cycle path and suggest alternatives (extract shared interface, use dependency inversion, restructure packages).
 
 ### Step 6: Update Status to In Progress
+
+Applies only to standard TaskManager-managed implementation. Patch the exact verified `subtask_path`; skip this step for standalone work and `validation-fix`.
 
 Use `edit` (NOT `write`) to patch only the status fields — preserving all other fields like `acceptance_criteria`, `deliverables`, and `context_files`:
 
@@ -305,6 +319,8 @@ If ANY check fails → fix the issue. Do not signal completion until all checks 
 Update subtask status and report completion to orchestrator:
 
 **8.1 Update Subtask Status** (REQUIRED for parallel execution tracking):
+For TaskManager-managed work, use the supplied `feature` and the verified JSON's `seq`. Standalone work skips 8.1 and 8.2 and reports directly via 8.3. Validation-fix uses its dedicated `fix_ready` handoff instead.
+
 ```bash
 # Mark this subtask as completed using task-cli.ts
 bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete {feature} {seq} "{completion_summary}"

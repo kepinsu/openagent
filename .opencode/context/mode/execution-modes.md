@@ -78,12 +78,13 @@ TaskManager should pass bounded context to each subtask:
 
 Each implementation agent should receive only:
 
-- original user request;
 - compact project brief;
-- its own subtask JSON;
-- task-specific context files;
-- task-specific reference files;
+- the exact `subtask_path` and `subtask_id` for its own subtask JSON, plus `feature` and `task_root`; the agent reads that artifact directly, without an intermediate reformulation;
+- task-specific context files read from that contract;
+- task-specific reference files read from that contract;
 - latest validation feedback when retrying.
+
+This artifact handoff applies in both modes. The JSON retains all native fields and is the authoritative working boundary. Pass optional execution-time context separately; do not duplicate JSON requirements in the prompt. Standalone `simple-task` uses its unchanged inline `single_subtask`. Retries retain the original artifact reference or standalone contract and add only the validation delta.
 
 ## Mode-Specific Conflict Rules
 
