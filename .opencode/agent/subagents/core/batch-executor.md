@@ -149,7 +149,7 @@ Make this call before reading any subtask JSON, reference file, source file, or 
 
 Do not read every subtask JSON, phase, or source file to gain a comprehensive picture. The task JSON plus next --json is sufficient to schedule work. Read only the ready subtask artifacts returned by next --json, and only when building that CoderAgent contract.
 
-Never read a subtask's reference_files, deliverables, or source files yourself. Put those paths in that one CoderAgent's context slice; the CoderAgent owns implementation discovery. Do not run a preflight build or validation command before delegation. The CoderAgent runs the subtask validation command, and batch-executor only performs its post-delegation completion verification.
+Never read a subtask's reference_files, deliverables, or source files yourself. Pass the selected subtask_path to the implementation agent; it reads those paths directly from the JSON and owns implementation discovery. Do not run a preflight build or validation command before delegation. The implementation agent runs the subtask validation command, and batch-executor only performs its post-delegation completion verification.
 
 After obtaining the first ready frontier, dispatch it immediately. Do not narrate a plan, repeat the dependency graph, or delay dispatch for additional exploration.
 
@@ -214,8 +214,8 @@ When `execution_route: simple-task` is supplied, treat `single_subtask` as the c
 
 When `execution_route: validation-fix` is supplied, do not restart planning or discovery. Delegate exactly one CoderAgent with:
 
-- the original subtask contract unchanged;
-- the narrow context slice for its target and reference files;
+- the original artifact handoff unchanged for TaskManager-managed work, or the original inline single_subtask for standalone work;
+- the working boundary read directly from that contract;
 - the latest validation command, failure output, affected files, and requested correction.
 
 The CoderAgent prompt MUST include `execution_route: validation-fix`. It must repair only the reported failure and run the supplied narrow validation command. Afterward, run TestEngineer and reviewer for the same subtask. Do not convert this route into a standard implementation retry. This route overrides the generic Context Resolution and standard retry workflow below.
@@ -238,39 +238,27 @@ It must never modify the execution plan.
 
 # Context Slicing
 
-batch-executor MUST build a task-specific context slice before invoking any implementation agent.
+For TaskManager-managed work, the context slice is an artifact handoff plus optional execution-time context. TaskManager owns the stable contract in the selected `subtask_NN.json`; the implementation agent MUST read that file directly.
 
-The context slice is the only implementation context that should be passed to `coder-agent`. Do not forward the full execution plan, full contextscout output, full ExternalScout output, full transcript, or unrelated task details.
+Pass these fields unchanged from the artifact contract and selected task:
 
-TaskManager owns the stable subtask contract. Build the context slice directly from the selected `subtask_NN.json` using this mapping:
+- `execution_route`: `standard`, or `validation-fix` for a correction;
+- `execution_mode`: the active mode;
+- `feature` and `task_root`;
+- `subtask_path`: the exact path of the one selected JSON file;
+- `subtask_id`: the selected JSON's `id`.
 
-- `id` and `title` → `task`;
-- `deliverables` → `target_files`;
-- `context_files` → `relevant_conventions`;
-- `reference_files` → `reference_files`;
-- `acceptance_criteria` → `acceptance_criteria`;
-- `validation_command` → `validation_command`.
+Do not copy the JSON into the prompt, summarize its requirements, rename its fields, or reconstruct an inline contract from it. In particular, do not map `deliverables` to `target_files` or `context_files` to `relevant_conventions`. All native fields, including optional `contracts`, `related_adrs`, and line-range objects, remain available through the JSON.
 
-Before dispatching, batch-executor may add only the execution-time information that varies for the current attempt:
+Only these optional additions belong outside the artifact contract:
 
-- a minimal global brief;
-- useful file excerpts or precise references;
-- external documentation directly required by the task;
-- validation feedback when retrying.
+- `global_brief`: the smallest useful project summary, at most 10 bullets;
+- `external_docs`: precise references to documentation directly needed for this task;
+- `retry_feedback`: latest failure, affected files, requested correction, narrow validation command, and a compact previous implementation summary when useful.
 
-batch-executor MUST then pass the resulting slice to `coder-agent`. It MUST NOT add a broad project rediscovery, unrelated history, or implementation guidance of its own.
+These additions MUST NOT replace or override the JSON's requirements. A retry may supply a failure-specific validation command, but MUST NOT rewrite the original validation command or acceptance criteria in the artifact.
 
-Each context slice MUST contain only:
-
-- `task`: the single implementation task to execute;
-- `acceptance_criteria`: the criteria for this task only;
-- `target_files`: files to create or modify for this task;
-- `reference_files`: existing source files the agent may inspect for this task;
-- `relevant_conventions`: coding standards, architecture rules, security constraints and testing conventions that apply to this task;
-- `global_brief`: the smallest useful project summary, ideally 5-10 bullets;
-- `external_docs`: only cached or fetched docs directly needed for this task;
-- `validation_command`: the narrowest useful validation command;
-- `retry_feedback`: only when retrying, containing the latest validation failure and requested correction.
+For `simple-task`, pass the original `single_subtask` unchanged instead of artifact fields. Preserve that inline contract when retrying standalone work. Never fabricate a JSON path for this route.
 
 The context slice MUST NOT contain:
 
@@ -281,7 +269,7 @@ The context slice MUST NOT contain:
 - previous agent chatter unrelated to the current task;
 - implementation details invented by batch-executor.
 
-In every mode, context slicing is mandatory and strict. A slice may include at most 12 total target, reference, and convention file paths unless the caller explicitly approves a larger investigation. If required information is missing, ask contextscout only for the missing item or report the missing context. Do not perform broad rediscovery.
+In every mode, context slicing is mandatory and strict. The referenced contract may include at most 12 total deliverable, reference, and convention file paths unless the caller explicitly approves a larger investigation. Do not trim the JSON to meet this budget; report `blocked: context_budget_exceeded` if it exceeds the limit. If required information is missing, ask contextscout only for the missing item or report the missing context. Do not perform broad rediscovery.
 
 ---
 
@@ -306,26 +294,27 @@ Do not replace a TaskManager frontend selection with `coder-agent`.
 
 Invoke the selected implementation agent using the Task tool.
 
-Build a context slice and provide only:
+Use the artifact handoff defined above. Example standard-route prompt (replace placeholders with actual values):
 
-- task;
-- acceptance criteria for this task;
-- target files and reference files for this task;
-- relevant conventions for this task;
-- minimal global brief;
-- external docs directly needed for this task, if any;
-- validation command;
-- retry feedback when retrying.
+```text
+execution_route: standard
+execution_mode: {active_mode}
+feature: {feature}
+task_root: {task_root}
+subtask_path: {selected_subtask_path}
+subtask_id: {selected_id}
 
-The prompt to the selected implementation agent MUST say that this context slice is the complete working boundary for the task.
+Read subtask_path before implementation. Verify its id matches subtask_id.
+That JSON is the authoritative contract and complete working boundary.
+Implement only this subtask, preserving all native requirements and references.
+Run its validation_command. Request context only for a concrete missing item.
+```
 
-The prompt MUST also state that the selected implementation agent is to implement only this contract and may request more context only when a concrete required item is missing from the slice.
+For `simple-task`, send the unchanged `single_subtask` with the same one-task boundary instead.
 
+Before delegation, verify that the handoff names exactly one existing subtask JSON inside task_root and that its id matches subtask_id. For standalone work, verify exactly one inline single_subtask instead.
 
-Before delegation, batch-executor MUST verify that the context slice contains
-exactly one TaskManager subtask contract and task ID.
-
-If a slice contains zero or multiple task contracts, do not delegate it.
+If a handoff contains zero or multiple task contracts, or a mismatched identity, do not delegate it.
 Report the contract violation and affected task IDs to the caller; do not ask
 the caller or user to choose which task should run.
 Wait for completion.
@@ -336,7 +325,7 @@ Wait for completion.
 
 Do not invoke test-engineer or reviewer for an individual subtask. The CoderAgent supplied narrow validation command is the only per-subtask validation.
 
-If that validation exposes a concrete implementation failure, invoke coder-agent once with execution_route: validation-fix and a fresh context slice containing only the original subtask contract, failure details, affected files, requested correction, and narrow validation command. Do not restart TaskManager, contextscout, ExternalScout, or the full CoderAgent workflow.
+If that validation exposes a concrete implementation failure, invoke coder-agent once with execution_route: validation-fix and the same artifact handoff (or unchanged standalone single_subtask), plus retry_feedback containing failure details, affected files, requested correction, and narrow validation command. Do not restart TaskManager, contextscout, ExternalScout, or the full CoderAgent workflow.
 
 ## Step 4
 
@@ -359,7 +348,7 @@ Build one final validation slice containing only:
 
 1. Invoke test-engineer once with this final slice. It must run the supplied narrow feature validation and return a compact result.
 2. Only when testing passes, invoke reviewer once with the same final slice plus the compact test result. It reviews only the changed files and supplied conventions.
-3. If either agent reports one blocking failure, map the affected file to its owning subtask and invoke that CoderAgent once with validation-fix. Pass only the original subtask contract, final-gate finding, affected files, requested correction, and narrow validation command. Do not call contextscout or ExternalScout.
+3. If either agent reports one blocking failure, map the affected file to its owning subtask and invoke that CoderAgent once with validation-fix. Pass the same artifact handoff (or unchanged standalone single_subtask), plus retry_feedback containing the final-gate finding, affected files, requested correction, and narrow validation command. Do not call contextscout or ExternalScout.
 4. Re-run only the failed final-gate check after the fix. Do not re-run earlier subtask validation, planning, discovery, or unrelated final checks.
 
 Final-gate reports must be summaries. Truncate retained failing-command output to the relevant error and at most 60 lines.
@@ -394,7 +383,7 @@ mode: 1 in local mode and 1 in provider mode.
 
 Every retry MUST use a fresh context slice containing only:
 
-- the original task;
+- the original artifact handoff (same subtask_path and subtask_id), or unchanged standalone single_subtask;
 - previous implementation summary;
 - validation failures;
 - requested corrections;
