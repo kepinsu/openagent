@@ -12,6 +12,23 @@
 
 ## Technical Debt
 
+### OpenCode V2 validation limits (2026-10-15)
+
+- Target: OpenCode/plugin/schema 2.0.29; tooling requires Node.js 22.19+.
+  This workstation's default Node was 18; checks used Node 22.23.3 via npm exec.
+- Agent `request.body.temperature` is retained but current V2 docs say agent
+  request overlays are not sent. Configure effective settings on providers or
+  models when needed.
+- LSP configuration is retained only as a private reference: V2 does not run it.
+  Use explicit CLI/MCP integrations and compiler/lint/test diagnostics.
+- Local profile variants send `chat_template_kwargs` as HTTP body fields. The
+  unsupported legacy `params.repeatPenalty` remains only in the archive until
+  the deployed oMLX server's accepted parameter is verified.
+- During live edits the existing service logged a skill-watcher subscription
+  timeout. Fresh isolated V2 startup discovered all skills successfully. If an
+  existing session retains a stale catalog, restart the service after ending
+  active work and start a new session.
+
 | Item | Impact | Priority | Mitigation |
 |------|--------|----------|------------|
 | [Debt item] | [What risk it creates] | [High/Med/Low] | [How to manage] |
@@ -42,6 +59,10 @@
 *Status*: [Open/In Progress/Blocked]
 
 ## Known Issues
+
+| Issue | Severity | Workaround | Status |
+|-------|----------|------------|--------|
+| Full build and lint were not run for Gx CCR completion. | Low | Package tests passed; run repository build and lint before broader integration or release use. | Known |
 
 | Issue | Severity | Workaround | Status |
 |-------|----------|------------|--------|

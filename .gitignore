@@ -34,3 +34,13 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+# Runtime state and private configuration (definitions are versioned).
+.opencode/node_modules/
+.opencodev1/node_modules/
+.opencodev1/opencode.json
+.opencodev1/opencode.jsonc
+.tmp/
+# OpenCode may insert the broad entry automatically. Re-open the definitions;
+# the specific runtime exclusions above and .opencode/.gitignore still apply.
+.opencode/
+!.opencode/

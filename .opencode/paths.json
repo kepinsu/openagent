@@ -1,0 +1,8 @@
+{
+  "context_root": ".opencode/context",
+  "agent_root": ".opencode/agents",
+  "skills_root": ".opencode/skills",
+  "task_root": ".tmp/tasks",
+  "external_context_root": ".tmp/external-context",
+  "global": false
+}

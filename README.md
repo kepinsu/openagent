@@ -9,6 +9,56 @@ OpenAgent was initially inspired by
 the Go skills from [cc-skills-golang](https://github.com/samber/cc-skills-golang).
 Its agents and execution rules are maintained locally in this repository.
 
+## Installation: OpenCode V2
+
+The active `.opencode/` tree targets **OpenCode 2.0.29** and the matching
+`@opencode/plugin` API. Use **Node.js 22.19 or newer** for dependency installation
+and the validation suite.
+
+```sh
+npm ci --prefix .opencode
+npm test --prefix .opencode
+npm run check --prefix .opencode
+```
+
+With OpenCode on `PATH` and Python 3 installed, run the optional clean-runtime
+discovery check with `npm run test:runtime --prefix .opencode`. It starts and stops
+its own authenticated server, checks plugin/agent/skill/command discovery, and
+does not submit prompts or load your personal configuration.
+
+For another project, link its `.opencode` to this repository's `.opencode`
+directory (only when the destination does not already exist):
+
+```sh
+ln -s /absolute/path/to/openagent/.opencode /path/to/project/.opencode
+```
+
+Copy `.opencode/opencode.example.jsonc` to `.opencode/opencode.jsonc` only for a
+fresh setup; merge it into an existing configuration instead of overwriting it.
+The runtime config is ignored by Git and may contain personal provider/MCP
+settings. A directory symlink shares that runtime config across consumers; use
+separate copies or global settings when machines/projects need different values.
+Use environment substitutions such as `{env:GITLAB_TOKEN}` for credentials.
+
+Agents, commands, skills and the local router plugin are discovered automatically.
+The example selects `core/opencoder-go` and a subagent depth of 3. Select that
+agent explicitly when using an existing session.
+
+## Machines still on V1
+
+`.opencodev1/` is a frozen pre-migration archive, including the V1 router and its
+dependency lockfile. On a V1 machine, point the consuming project's `.opencode`
+symlink at **`.opencodev1/`**, not at `.opencode/`:
+
+```sh
+ln -s /absolute/path/to/openagent/.opencodev1 /path/to/project/.opencode
+```
+
+Keep the existing paths inside the archive: they resolve through the `.opencode`
+link. See [.opencodev1/README.md](.opencodev1/README.md) for snapshot provenance,
+private configuration and compatibility details. The archive is not maintained
+in parallel with V2.
+
 ## Scope
 
 - Go is the only production-code specialization currently configured.
@@ -28,6 +78,42 @@ Its agents and execution rules are maintained locally in this repository.
 | Merge or pull request review | MergeRequestReviewer | Read-only review workflow; it is never auto-selected. |
 | Product story, issue, or product documentation | ProductOwner | Product workflow; it is never auto-selected. |
 | Turn a short request into an OpenGoCoder prompt | /open-prompt request | Returns a bounded prompt only; it does not implement anything. |
+
+## OpenCode 2 agent names
+
+OpenCode 2 registers nested agents by their path relative to the agent
+directory, without the Markdown extension. Use these exact identifiers when
+selecting agents, calling the subagent tool, or setting delegation permissions:
+
+| Role | OpenCode 2 identifier |
+| --- | --- |
+| OpenGoCoder | `core/opencoder-go` |
+| ContextScout | `subagents/core/contextscout` |
+| ExternalScout | `subagents/core/externalscout` |
+| TaskManager | `subagents/core/task-manager` |
+| batch-executor | `subagents/core/batch-executor` |
+| CoderAgent | `subagents/code/coder-agent` |
+| Frontend specialist | `subagents/code/open-frontend-specialist` |
+| TestEngineer | `subagents/code/test-engineer` |
+| reviewer | `subagents/code/reviewer` |
+| docwriter | `subagents/core/documentation` |
+| MergeRequestReviewer | `core/merge-request-reviewer` |
+| ProductOwner | `core/product-owner` |
+| system-builder | `core/system-builder` |
+
+For example, call `subagent(agent="subagents/core/contextscout", ...)`.
+`ContextScout` is a role label, not a registered subagent identifier. Built-in
+`explore` keeps its built-in name. The shorter names elsewhere in this README
+refer to roles; the table above gives their executable identifiers.
+
+After deploying these configuration changes, restart OpenCode and start a new
+session with `core/opencoder-go` so the old prompts are not reused. Existing
+TaskManager artifacts may still contain short `suggested_agent` values;
+batch-executor maps the supported legacy implementation names before dispatch.
+
+Validate native V2 configuration, agent references, the routing plugin and archive
+integrity with `npm test --prefix .opencode`. Check the plugin against the pinned
+V2 API with `npm run check --prefix .opencode`.
 
 ## Development routing
 
@@ -155,21 +241,52 @@ The repository contains two profile files:
 | File | Purpose |
 | --- | --- |
 | .opencode/profiles/local.jsonc | Local oMLX profile using http://localhost:9090/v1. Its default model is omlx/Qwen3.6-35B-A3B-MLX-4bit and it defines thinking and fast variants. |
-| .opencode/profiles/provider.jsonc | Compact limits and routing policy intended for hosted providers. It does not define a provider or default model. |
+| .opencode/profiles/provider.jsonc | Native V2 delegation-depth setting for hosted providers. It does not define a provider or default model. |
 
-These profiles do not activate themselves: the repository contains no profile
-switch command. Keep .opencode/opencode.jsonc aligned with the profile you
-intend OpenCode to use.
+These profiles do not activate themselves: merge the chosen profile's settings
+into `.opencode/opencode.jsonc`, preserving other providers, MCP servers and
+permissions. They are native V2 JSONC templates, not standalone OpenAgent policy
+files. Pass `execution_mode: local` or `execution_mode: provider` in the prompt;
+the workflow defaults to `local`. Limits and routing preferences live in
+`.opencode/context/mode/execution-modes.md`.
+
+The local profile sends `chat_template_kwargs` as variant HTTP body fields.
+The legacy `params.repeatPenalty` had no documented native V2 equivalent and is
+retained only in the archive; configure a repetition penalty only after checking
+the actual oMLX endpoint's accepted parameter. Model availability, these body
+extensions and context limits must be checked against the running local server.
+
+### V2 behavior to account for
+
+- Permissions use ordered rules: broad defaults precede specific exceptions.
+  `shell` replaces `bash`, `subagent` replaces `task`, and `edit` covers all file
+  mutations. The merge-request reviewer remains read-only. Path wildcards use
+  V2 matching (`*` includes slashes), so root-level and nested files are covered.
+- Agent temperatures are retained under `request.body`. Current V2 documentation
+  says agent request overlays are not yet sent to the model; use provider/model
+  settings if an effective temperature is required.
+- V2 does not run the configured LSP servers. Use explicit gopls CLI/MCP support
+  when available, and compiler/lint/test commands for diagnostics.
+- Upstream Go skills retain portable source metadata and examples for other
+  clients. Their `allowed-tools` fields do not grant OpenCode permissions; the
+  agent's V2 permissions and actual tool catalog govern execution. Use `AGENTS.md`
+  for project instructions, and `shell`, `subagent`, `question` and configured MCP
+  tools in place of client-specific tool names.
+- Terminal preferences belong in the global `~/.config/opencode/cli.json`, not
+  a project `tui.json` or `opencode.jsonc`.
+- The router appends its hint at prompt admission, preserving existing attachment
+  mention offsets, and reads the session location after moves.
 
 ## Repository layout
 
 ~~~
 .opencode/
-  agent/
+  agents/
     core/                 primary agents
     subagents/code/       implementation and quality agents
     subagents/core/       discovery, planning, execution, and documentation
     subagents/system-builder/ context bootstrap subagents
+    local/                specialized review panel
   commands/
     open-prompt.md
   context/
@@ -184,6 +301,9 @@ intend OpenCode to use.
   skills/
     go/
     task-management/
+  tests/                  V2 configuration and routing regressions
+  opencode.example.jsonc  shareable runtime template
+.opencodev1/              frozen snapshot for V1 symlinks
 ~~~
 
 ## Validation behavior

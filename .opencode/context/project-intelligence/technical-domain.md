@@ -12,6 +12,28 @@
 
 ## Primary Stack
 
+### OpenAgent runtime (2026-10-15)
+
+The active configuration targets OpenCode 2.0.29. Agents live under
+`.opencode/agents/`; IDs are relative paths without `.md`. The router uses
+`@opencode/plugin` 2.0.29 and the session `prompt` hook. It appends an
+implementation hint without switching the primary agent and reads the session's
+current location. Node.js 22.19+ runs the ESM task CLI and repository tests.
+
+`.opencodev1/` is the immutable pre-migration snapshot intended for V1 symlinks.
+Its manifest covers original working-tree contents; private runtime configuration
+and installed dependencies are excluded. Both trees keep `.opencode/...` paths
+so a consuming project's symlink resolves them normally.
+
+Profiles contain native V2 configuration only. Workflow budgets and execution
+mode selection are defined in `../mode/execution-modes.md`. The local profile's
+variants use HTTP body overlays for `chat_template_kwargs`; their acceptance by
+the running oMLX server is an external validation requirement.
+
+Validation: `npm test --prefix .opencode`, `npm run check --prefix .opencode`,
+and the opt-in `npm run test:runtime --prefix .opencode`. The runtime smoke check
+uses a private server with isolated configuration and sends no model prompts.
+
 | Layer | Technology | Version | Rationale |
 |-------|-----------|---------|-----------|
 | Language | Go | [Version] | [Why this language] |
@@ -58,6 +80,10 @@ Diagram: [Link to architecture diagram if exists]
 See `decisions-log.md` for full decision history with alternatives.
 
 ## Integration Points
+
+### Gx Diameter CCR handling
+
+The PCF Gx Diameter server parses confirmed inbound CCR AVPs into existing SM policy request models. It dispatches Initial, Update, and Termination requests through the established policy flow; Initial requests carry `SourceGx`. Framed IPv6 prefixes use the fixed 16-byte prefix encoding. The `parseCCR` unit scenarios use named table-driven `t.Run` subtests while preserving scenario-specific assertions.
 
 | System | Purpose | Protocol | Direction |
 |--------|---------|----------|-----------|
