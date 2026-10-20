@@ -35,7 +35,7 @@ Create one `subtask_NN.json` per implementation unit:
   "status": "pending",
   "depends_on": [],
   "parallel": false,
-  "suggested_agent": "CoderAgent",
+  "suggested_agent": "subagents/code/coder-agent",
   "context_files": [".opencode/context/standards/code.md"],
   "reference_files": ["path/to/source.go"],
   "acceptance_criteria": ["Behavior is implemented", "Relevant tests pass"],

@@ -10,6 +10,31 @@
 - **Format**: Each decision as a separate entry
 - **Status**: Decided | Pending | Under Review | Deprecated
 
+## Decision: Native OpenCode V2 with a frozen V1 symlink archive
+
+**Date**: 2026-10-15
+**Status**: Decided
+
+### Context
+The repository mixed V1 plugin/agent syntax with V2 identifiers and local MCP
+configuration. Some consuming machines still run V1 and use directory symlinks.
+
+### Decision
+Use `.opencode/` for native V2 and `.opencodev1/` as an immutable snapshot of the
+pre-migration working files. Keep `.opencode/...` paths inside both trees so the
+consumer's link selects the version. Exclude private runtime configuration and
+installed dependencies. Pin the V2 plugin API to 2.0.29 and validate schema and
+runtime discovery against that release.
+
+### Impact
+There is one actively maintained implementation. The archive is hash-checked,
+not backported. OpenAgent workflow preferences live in execution-mode context,
+not invented OpenCode config fields. The router remains a hint-only plugin;
+it does not switch agents. Ordered permissions put defaults before exceptions
+and use V2 path wildcards; the primary MR reviewer remains read-only.
+
+---
+
 ## Decision Template
 
 ```markdown
@@ -42,7 +67,6 @@
 ### Related
 - [Links to related decisions, PRs, issues, or documentation]
 ```
-
 ---
 
 ## Decision: [Title]

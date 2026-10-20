@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+import fs from "node:fs";
+import path from "node:path";
 const validStatuses = new Set(["pending", "in_progress", "completed", "blocked"]);
 const root = path.join(process.cwd(), ".tmp", "tasks");
 

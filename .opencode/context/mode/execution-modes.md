@@ -2,7 +2,13 @@
 
 OpenAgent can run in two modes: `local` and `provider`.
 
-The caller should explicitly tell agents which mode is active. If no mode is supplied, assume `local` because the default `.opencode/opencode.jsonc` is configured for LM Studio.
+The caller should explicitly pass `execution_mode: local` or `execution_mode: provider`.
+If no mode is supplied, assume `local`. This is a workflow default, independent of
+the selected provider. This document is the source of truth for OpenAgent limits;
+`openagent_mode`, `agent_policy`, and `model_routing` are not OpenCode config fields.
+The profiles contain only native V2 settings. Limits other than
+`experimental.subagent_depth` are instructions enforced by the orchestrator, not
+runtime-enforced OpenCode settings.
 
 ## Local Mode
 
@@ -19,7 +25,7 @@ Behavior:
 
 Recommended limits for a 70k-token model:
 
-- subagent_depth: 3
+- experimental.subagent_depth: 3
 - max_parallel_agents: 2
 - max_retries_per_task: 1
 - context_strategy: compact
@@ -45,14 +51,24 @@ Behavior:
 
 Recommended limits:
 
-- `subagent_depth`: 3
+- `experimental.subagent_depth`: 3
 - `max_parallel_agents`: 2
 - `max_retries_per_task`: 1
 - `context_strategy`: `compact`
 - `external_scout`: `on_demand`
 - `share_raw_findings`: false
 - `max_files_per_agent`: 8
-- `max_context_tokens_per_agent`: 12000
+- `max_context_tokens_per_agent`: 120000
+
+The provider budget follows the pre-migration profile's 120000-token ceiling;
+it is an upper bound, not a target. Always keep handoffs compact and within the
+selected model's actual context limit.
+
+Model routing remains a planning preference: use cheap/balanced models for
+scouting, planning and documentation, stronger models for implementation, and
+balanced models for validation. Only select real configured model IDs; labels
+such as `provider-cheap` are not executable model references. Subagents inherit
+the parent model unless a valid override is explicitly configured or requested.
 
 ## Compact Context Contract
 

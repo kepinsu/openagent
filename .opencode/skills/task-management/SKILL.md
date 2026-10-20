@@ -23,26 +23,26 @@ I provide a command-line interface for managing task breakdowns created by the T
 
 ## How to Use Me
 
-All router invocations first use the project-local router when available; otherwise they use the globally installed router at `~/.opencode/skills/task-management/router.sh`. In both cases, task artifacts remain in the current project under `.tmp/tasks/`.
+All router invocations first use the project-local router when available; otherwise they use the globally installed router at `$XDG_CONFIG_HOME/opencode/skills/task-management/router.sh` (default: `~/.config/opencode/skills/task-management/router.sh`). In both cases, task artifacts remain in the current project under `.tmp/tasks/`.
 
 
 ### Quick Start
 
 ```bash
 # Show all task statuses
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" status
 
 # Show next eligible tasks
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" next
 
 # Show blocked tasks
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" blocked
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" blocked
 
 # Mark a task complete
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete <feature> <seq> "summary"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" complete <feature> <seq> "summary"
 
 # Validate all tasks
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate
 ```
 
 ### Command Reference
@@ -65,7 +65,7 @@ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencod
 ### Check Overall Progress
 
 ```bash
-$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" status
 
 [my-feature] My Feature Implementation
   Status: active | Progress: 45% (5/11)
@@ -75,7 +75,7 @@ $ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .openc
 ### Find What's Next
 
 ```bash
-$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" next
 
 === Ready Tasks (deps satisfied) ===
 
@@ -87,7 +87,7 @@ $ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .openc
 ### Mark Complete
 
 ```bash
-$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete my-feature 05 "Implemented authentication module"
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" complete my-feature 05 "Implemented authentication module"
 
 ✓ Marked my-feature/05 as completed
   Summary: Implemented authentication module
@@ -97,7 +97,7 @@ $ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .openc
 ### Check Dependencies
 
 ```bash
-$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" deps my-feature 07
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" deps my-feature 07
 
 === Dependency Tree: my-feature/07 ===
 
@@ -109,7 +109,7 @@ $ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .openc
 ### Validate Everything
 
 ```bash
-$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
+$ bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate
 
 === Validation Results ===
 
@@ -174,7 +174,7 @@ Tasks are stored in `.tmp/tasks/` at the project root:
   "status": "pending",
   "depends_on": ["03", "04"],
   "parallel": false,
-  "suggested_agent": "coder-agent",
+  "suggested_agent": "subagents/code/coder-agent",
   "context_files": ["docs/auth.md"],
   "reference_files": ["src/auth-old.ts"],
   "acceptance_criteria": ["Login works", "JWT tokens valid"],
@@ -192,8 +192,8 @@ Tasks are stored in `.tmp/tasks/` at the project root:
 The TaskManager subagent creates task files using this format. When you delegate to TaskManager:
 
 ```javascript
-task(
-  subagent_type="TaskManager",
+subagent(
+  agent="subagents/core/task-manager",
   description="Implement feature X",
   prompt="Break down this feature into atomic subtasks..."
 )
@@ -251,7 +251,7 @@ The `validate` command performs comprehensive checks on task files:
 
 Run `validate` regularly to catch issues early:
 ```bash
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate my-feature
 ```
 
 ### 6. Context and Reference Files
@@ -284,49 +284,49 @@ Working agents (CoderAgent, TestEngineer, etc.) execute subtasks and report comp
 
 ```bash
 # 1. TaskManager creates the task structure
-task(subagent_type="TaskManager", description="Implement feature X", ...)
+subagent(agent="subagents/core/task-manager", description="Implement feature X", ...)
 
 # 2. Check what's ready
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" next
 
 # 3. Delegate first task to working agent
-task(subagent_type="CoderAgent", description="Implement subtask 01", ...)
+subagent(agent="subagents/code/coder-agent", description="Implement subtask 01", ...)
 ```
 
 ### Tracking Progress
 
 ```bash
 # Check overall status
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" status my-feature
 
 # See what's next
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" next my-feature
 
 # Check what's blocked
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" blocked my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" blocked my-feature
 ```
 
 ### Completing Tasks
 
 ```bash
 # After working agent finishes
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" complete my-feature 05 "Implemented auth module with JWT support"
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" complete my-feature 05 "Implemented auth module with JWT support"
 
 # Check progress
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" status my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" status my-feature
 
 # Find next task
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" next my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" next my-feature
 ```
 
 ### Validating Everything
 
 ```bash
 # Validate all tasks
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate
 
 # Validate specific feature
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate my-feature
 ```
 
 ---
@@ -346,19 +346,19 @@ complete my-feature 05 "Done"
 ### 2. Check Dependencies Before Starting
 ```bash
 # See what a task depends on
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" deps my-feature 07
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" deps my-feature 07
 ```
 
 ### 3. Identify Parallelizable Work
 ```bash
 # Find tasks that can run in parallel
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" parallel my-feature
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" parallel my-feature
 ```
 
 ### 4. Regular Validation
 ```bash
 # Validate regularly to catch issues early
-bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s ~/.opencode/skills/task-management/router.sh)" validate
+bash "$(test -f .opencode/skills/task-management/router.sh && printf %s .opencode/skills/task-management/router.sh || printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills/task-management/router.sh")" validate
 ```
 
 ---

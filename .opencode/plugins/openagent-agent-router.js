@@ -1,6 +1,6 @@
-const DEVELOPMENT_ENTRY_AGENT = "OpenGoCoder";
-const FRONTEND_AGENT = "open-frontend-specialist";
-const GO_AGENT = "coder-agent";
+const DEVELOPMENT_ENTRY_AGENT = "core/opencoder-go";
+const FRONTEND_AGENT = "subagents/code/open-frontend-specialist";
+const GO_AGENT = "subagents/code/coder-agent";
 
 const FRONTEND_PATTERNS = [
   /\b(?:front(?:end|-end)?|ui|ux|react|vue|angular|svelte|next(?:\.js)?|nuxt|tailwind|css|html|typescript|tsx|jsx|component|accessibility|responsive)\b/g,
@@ -28,8 +28,7 @@ const FRONTEND_CONFIG_FILES = [
 const FRONTEND_PACKAGE_PATTERN =
   /"(?:react|react-dom|next|vue|@angular\/core|svelte|@sveltejs\/kit|nuxt|solid-js|preact|tailwindcss)"\s*:/;
 
-const projectAgentCache = new Map();
-
+/** @param {string} text @param {RegExp[]} patterns */
 function countMatches(text, patterns) {
   return patterns.reduce((count, pattern) => {
     const matches = text.match(pattern);
@@ -37,6 +36,7 @@ function countMatches(text, patterns) {
   }, 0);
 }
 
+/** @param {string} text */
 function agentForPrompt(text) {
   const normalized = text.toLowerCase();
   const frontendScore = countMatches(normalized, FRONTEND_PATTERNS);
@@ -49,32 +49,27 @@ function agentForPrompt(text) {
   return frontendScore > goScore ? FRONTEND_AGENT : GO_AGENT;
 }
 
-function textFromParts(parts) {
-  return parts
-    .filter((part) => part.type === "text" && !part.ignored)
-    .map((part) => part.text)
-    .join("\n");
-}
-
+/** @param {string} directory @param {string} file */
 async function exists(directory, file) {
-  return Bun.file(directory + "/" + file).exists();
+  try {
+    await access(path.join(directory, file));
+    return true;
+  } catch (error) {
+    if (/** @type {NodeJS.ErrnoException} */ (error).code === "ENOENT") return false;
+    throw error;
+  }
 }
 
+/** @param {string} directory */
 async function agentForProject(directory) {
-  if (typeof Bun === "undefined") {
-    return undefined;
-  }
-
   const goProject = await exists(directory, "go.mod");
   const frontendConfig = await Promise.all(
     FRONTEND_CONFIG_FILES.map((file) => exists(directory, file)),
   );
 
   let frontendProject = frontendConfig.some(Boolean);
-  const packageFile = Bun.file(directory + "/package.json");
-
-  if (await packageFile.exists()) {
-    const packageContent = await packageFile.text();
+  if (await exists(directory, "package.json")) {
+    const packageContent = await readFile(path.join(directory, "package.json"), "utf8");
     frontendProject = frontendProject || FRONTEND_PACKAGE_PATTERN.test(packageContent);
   }
 
@@ -85,56 +80,39 @@ async function agentForProject(directory) {
   return frontendProject ? FRONTEND_AGENT : GO_AGENT;
 }
 
-function cachedProjectAgent(directory) {
-  if (!projectAgentCache.has(directory)) {
-    projectAgentCache.set(directory, agentForProject(directory));
-  }
-
-  return projectAgentCache.get(directory);
-}
-
-async function selectAgent(parts, directory) {
-  const promptAgent = agentForPrompt(textFromParts(parts));
+/** @param {string} text @param {string} directory */
+async function selectAgent(text, directory) {
+  const promptAgent = agentForPrompt(text);
 
   if (promptAgent) {
     return promptAgent;
   }
 
-  return cachedProjectAgent(directory);
+  // Recheck the effective directory: sessions can move and projects can change.
+  return agentForProject(directory);
 }
 
-function isDevelopmentRequest(inputAgent, outputAgent) {
-  return (
-    inputAgent === DEVELOPMENT_ENTRY_AGENT ||
-    (!inputAgent && outputAgent === DEVELOPMENT_ENTRY_AGENT)
-  );
-}
+export default Plugin.define({
+  id: "openagent.agent-router",
+  async setup(ctx) {
+    await ctx.session.hook("prompt", async (event) => {
+      const text = event.prompt.text;
+      if (!text?.trim() || text.includes("[OpenAgent route hint:")) return;
 
-export const OpenAgentAgentRouter = async ({ directory }) => ({
-  "chat.message": async (input, output) => {
-    if (!isDevelopmentRequest(input.agent, output.message.agent)) {
-      return;
-    }
+      const session = await ctx.session.get({ sessionID: event.sessionID });
+      if (session.agent !== DEVELOPMENT_ENTRY_AGENT) return;
 
-    const agent = await selectAgent(output.parts, directory);
+      const agent = await selectAgent(text, session.location.directory);
+      if (!agent) return;
 
-if (agent) {
-  const textPart = output.parts.find(
-    (part) => part.type === "text" && !part.ignored,
-  );
-
-  if (!textPart) {
-    return;
-  }
-
-  const hint =
-    "[OpenAgent route hint: implementation_agent=" +
-    agent +
-    ". Keep OpenGoCoder as the primary orchestrator; " +
-    "task-manager must record this agent in each relevant subtask's " +
-    "suggested_agent field.]";
-
-  textPart.text = hint + "\n\n" + textPart.text;
-}
+      // Append rather than prepend so existing attachment mention offsets survive.
+      event.prompt.text = text + "\n\n[OpenAgent route hint: implementation_agent=" +
+        agent + ". Keep core/opencoder-go as the primary orchestrator; " +
+        "task-manager must record this agent in each relevant subtask's " +
+        "suggested_agent field.]";
+    });
   },
 });
+import { access, readFile } from "node:fs/promises";
+import path from "node:path";
+import { Plugin } from "@opencode/plugin";
