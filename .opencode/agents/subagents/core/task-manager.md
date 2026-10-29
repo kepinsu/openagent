@@ -15,6 +15,13 @@ permissions:
 - action: shell
   resource: mkdir -p .tmp/tasks*
   effect: allow
+## OpenAI love to use printf and test command
+- action: shell
+  resource: printf *
+  effect: allow
+- action: shell
+  resource: test *
+  effect: allow
 - action: shell
   resource: mv .tmp/tasks*
   effect: allow
